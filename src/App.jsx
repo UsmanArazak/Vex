@@ -27,20 +27,23 @@ function App() {
   };
 
   return (
-    <Layout 
-      currentPath={currentPath} 
-      onNavigate={setCurrentPath} 
-      onOpenAdd={() => setIsGlobalAddOpen(true)}
-    >
-      <div key={refreshKey}>
-        {renderContent()}
-      </div>
+    <>
+      <Layout 
+        currentPath={currentPath} 
+        onNavigate={setCurrentPath} 
+        onOpenAdd={() => setIsGlobalAddOpen(true)}
+      >
+        <div key={refreshKey}>
+          {renderContent()}
+        </div>
+      </Layout>
+      
       <TransactionModal 
         isOpen={isGlobalAddOpen}
         onClose={() => setIsGlobalAddOpen(false)}
         onSaved={() => setRefreshKey(k => k + 1)}
       />
-    </Layout>
+    </>
   );
 }
 

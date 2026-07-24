@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { getCategories, saveTransaction } from '../utils/storage';
 
 const TransactionModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
@@ -47,8 +48,8 @@ const TransactionModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
 
   const filteredCategories = categories.filter(c => c.type === type);
 
-  return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end bg-brand-charcoal/40 backdrop-blur-sm animate-in fade-in duration-200">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex flex-col justify-end bg-brand-charcoal/40 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white rounded-t-3xl p-6 w-full max-w-md mx-auto shadow-2xl animate-in slide-in-from-bottom-full duration-300">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold">{initialData ? 'Edit' : 'Add'} Transaction</h2>
@@ -126,7 +127,8 @@ const TransactionModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
           </button>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

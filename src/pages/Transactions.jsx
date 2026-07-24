@@ -45,16 +45,38 @@ const Transactions = () => {
   const formatCurrency = (val) => `₦${val.toLocaleString()}`;
   const getCategory = (id) => categories.find(c => c.id === id) || { name: 'Other', color: '#ccc' };
 
+  // Calculate current month expense
+  const currentMonthExpense = useMemo(() => {
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    
+    return transactions
+      .filter(t => t.type === 'expense')
+      .filter(t => {
+        const d = parseISO(t.date);
+        return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+      })
+      .reduce((acc, t) => acc + t.amount, 0);
+  }, [transactions]);
+
   return (
     <div className="p-6 pt-12">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-brand-charcoal">Activity</h1>
         <button 
           onClick={() => { setEditingTx(null); setIsModalOpen(true); }}
-          className="bg-brand-gold text-brand-charcoal p-2 rounded-xl shadow-sm font-bold text-sm"
+          className="bg-brand-gold text-brand-charcoal p-2 rounded-xl shadow-sm font-bold text-sm px-4"
         >
           + Add New
         </button>
+      </div>
+
+      {/* Monthly Tracker */}
+      <div className="card bg-gray-50 border border-gray-100 p-5 mb-6 flex justify-between items-center shadow-sm">
+        <div>
+          <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">This Month's Spending</p>
+          <p className="text-2xl font-bold text-brand-charcoal">{formatCurrency(currentMonthExpense)}</p>
+        </div>
       </div>
 
       {/* Filters based on the image's pill filters */}
