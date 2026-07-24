@@ -1,0 +1,93 @@
+import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
+import { getCategories, saveCategories } from '../utils/storage';
+import CategoryModal from './CategoryModal';
+
+const CategoriesListModal = ({ isOpen, onClose }) => {
+  const [categories, setCategories] = useState(getCategories());
+  const [activeCategory, setActiveCategory] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const refreshCategories = () => {
+    setCategories(getCategories());
+  };
+
+  const handleEdit = (cat) => {
+    setActiveCategory(cat);
+    setIsEditModalOpen(true);
+  };
+
+  const handleDelete = (id) => {
+    if (confirm("Are you sure you want to delete this category? Transactions using this category won't be deleted, but they might show as 'Other'.")) {
+      const newCats = categories.filter(c => c.id !== id);
+      saveCategories(newCats);
+      refreshCategories();
+    }
+  };
+
+  const handleAddNew = () => {
+    setActiveCategory(null);
+    setIsEditModalOpen(true);
+  };
+
+  if (!isOpen) return null;
+
+  return createPortal(
+    <>
+      <div className="fixed inset-0 z-50 flex flex-col justify-end bg-brand-charcoal/40 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="bg-white rounded-t-3xl p-6 w-full max-w-md mx-auto shadow-2xl h-[80vh] flex flex-col animate-in slide-in-from-bottom-full duration-300">
+          <div className="flex justify-between items-center mb-6 shrink-0">
+            <h2 className="text-xl font-bold">Manage Categories</h2>
+            <button onClick={onClose} className="p-2 bg-gray-100 rounded-full text-gray-500 hover:text-brand-charcoal">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+          </div>
+
+          <button 
+            onClick={handleAddNew}
+            className="w-full bg-brand-gold text-brand-charcoal font-bold py-3 rounded-xl mb-4 shrink-0 shadow-sm"
+          >
+            + Add New Category
+          </button>
+
+          <div className="flex-1 overflow-y-auto hide-scrollbar pb-10">
+            {categories.map((cat, idx) => (
+              <div 
+                key={cat.id} 
+                className={`flex justify-between items-center p-4 ${idx !== categories.length - 1 ? 'border-b border-gray-50' : ''}`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs shadow-sm" style={{ backgroundColor: cat.color }}>
+                    {cat.name.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="font-bold text-sm text-brand-charcoal">{cat.name}</p>
+                    <p className="text-xs text-gray-400 capitalize">{cat.type}</p>
+                  </div>
+                </div>
+                <div className="flex gap-1">
+                  <button onClick={() => handleEdit(cat)} className="text-sm text-gray-400 hover:text-brand-charcoal p-2 rounded-lg bg-gray-50 hover:bg-gray-100">
+                    Edit
+                  </button>
+                  <button onClick={() => handleDelete(cat.id)} className="text-sm text-red-400 hover:text-red-600 p-2 rounded-lg bg-red-50 hover:bg-red-100">
+                    Del
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <CategoryModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        initialData={activeCategory}
+        onSaved={refreshCategories}
+      />
+    </>,
+    document.body
+  );
+};
+
+export default CategoriesListModal;

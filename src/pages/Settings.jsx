@@ -1,22 +1,10 @@
 import React, { useState, useRef } from 'react';
-import { getCategories, exportData, importData, clearAllData } from '../utils/storage';
-import CategoryModal from '../components/CategoryModal';
+import { exportData, importData, clearAllData } from '../utils/storage';
+import CategoriesListModal from '../components/CategoriesListModal';
 
 const Settings = () => {
-  const [categories, setCategories] = useState(getCategories());
-  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState(null);
-  
+  const [isCategoriesModalOpen, setIsCategoriesModalOpen] = useState(false);
   const fileInputRef = useRef(null);
-
-  const refreshCategories = () => {
-    setCategories(getCategories());
-  };
-
-  const openEditCategory = (cat) => {
-    setActiveCategory(cat);
-    setIsCategoryModalOpen(true);
-  };
 
   // Export Data
   const handleExport = () => {
@@ -25,7 +13,7 @@ const Settings = () => {
     const downloadAnchorNode = document.createElement('a');
     downloadAnchorNode.setAttribute("href", dataStr);
     downloadAnchorNode.setAttribute("download", `vex_wallet_backup_${new Date().toISOString().split('T')[0]}.json`);
-    document.body.appendChild(downloadAnchorNode); // required for firefox
+    document.body.appendChild(downloadAnchorNode);
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
   };
@@ -48,14 +36,13 @@ const Settings = () => {
       }
     };
     reader.readAsText(file);
-    // Reset input
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   // Clear Data
   const handleClearData = () => {
     if (window.confirm("WARNING! Are you absolutely sure you want to delete ALL your transactions, goals, and custom categories? This action CANNOT be undone.")) {
-      if (window.confirm("Final confirmation: Type OK to proceed or Cancel to abort.")) {
+      if (window.confirm("Final confirmation: Are you sure?")) {
         clearAllData();
         alert('All data has been cleared. The app will now reload.');
         window.location.reload();
@@ -67,63 +54,41 @@ const Settings = () => {
     <div className="p-6 pt-12 pb-24 space-y-8">
       <h1 className="text-3xl font-bold text-brand-charcoal mb-8">Settings</h1>
 
-      {/* Categories Management */}
+      {/* Categories */}
       <section>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="font-bold text-xl">Categories</h2>
-          <button 
-            onClick={() => { setActiveCategory(null); setIsCategoryModalOpen(true); }}
-            className="text-brand-charcoal bg-gray-100 px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-gray-200"
+        <h2 className="font-bold text-xl mb-4">Categories</h2>
+        <div className="card border border-gray-100 shadow-sm p-5">
+          <p className="text-sm text-gray-500 mb-4">Add, edit or delete your spending and income categories.</p>
+          <button
+            onClick={() => setIsCategoriesModalOpen(true)}
+            className="w-full flex items-center justify-center gap-2 bg-brand-charcoal text-white font-semibold py-3 rounded-xl hover:bg-gray-800 transition-colors"
           >
-            + Add New
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            Manage Categories
           </button>
-        </div>
-        
-        <div className="card p-0 overflow-hidden border border-gray-100 shadow-sm">
-          <div className="max-h-64 overflow-y-auto hide-scrollbar">
-            {categories.map((cat, idx) => (
-              <div 
-                key={cat.id} 
-                className={`flex justify-between items-center p-4 ${idx !== categories.length - 1 ? 'border-b border-gray-50' : ''}`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs shadow-sm" style={{ backgroundColor: cat.color }}>
-                    {cat.name.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="font-bold text-sm text-brand-charcoal">{cat.name}</p>
-                    <p className="text-xs text-gray-400 capitalize">{cat.type}</p>
-                  </div>
-                </div>
-                <button onClick={() => openEditCategory(cat)} className="text-sm text-brand-gold font-bold p-2 hover:bg-gray-50 rounded-lg">
-                  Edit
-                </button>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
-      {/* Data Management */}
+      {/* Data Backup */}
       <section>
         <h2 className="font-bold text-xl mb-4">Data Backup</h2>
-        <div className="card space-y-4 shadow-sm border border-gray-100 p-5">
-          <p className="text-sm text-gray-500 mb-4">Your data is stored locally on your device. Export it regularly to avoid losing it if you clear your browser data.</p>
-          
-          <button 
+        <div className="card space-y-3 shadow-sm border border-gray-100 p-5">
+          <p className="text-sm text-gray-500 mb-2">Your data is stored locally. Export regularly to avoid losing it.</p>
+
+          <button
             onClick={handleExport}
             className="w-full flex items-center justify-center gap-2 bg-brand-charcoal text-white font-semibold py-3 rounded-xl hover:bg-gray-800 transition-colors"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Export Backup (JSON)
           </button>
-          
+
           <div className="relative">
-            <input 
-              type="file" 
-              accept=".json" 
+            <input
+              type="file"
+              accept=".json"
               ref={fileInputRef}
-              onChange={handleImport} 
+              onChange={handleImport}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             />
             <button className="w-full flex items-center justify-center gap-2 bg-gray-100 text-brand-charcoal font-semibold py-3 rounded-xl hover:bg-gray-200 transition-colors">
@@ -138,7 +103,7 @@ const Settings = () => {
       <section>
         <h2 className="font-bold text-xl mb-4 text-red-500">Danger Zone</h2>
         <div className="card shadow-sm border border-red-100 p-5 bg-red-50/30">
-          <button 
+          <button
             onClick={handleClearData}
             className="w-full bg-red-100 text-red-600 font-bold py-3 rounded-xl hover:bg-red-200 transition-colors"
           >
@@ -147,11 +112,9 @@ const Settings = () => {
         </div>
       </section>
 
-      <CategoryModal
-        isOpen={isCategoryModalOpen}
-        onClose={() => setIsCategoryModalOpen(false)}
-        initialData={activeCategory}
-        onSaved={refreshCategories}
+      <CategoriesListModal
+        isOpen={isCategoriesModalOpen}
+        onClose={() => setIsCategoriesModalOpen(false)}
       />
     </div>
   );
