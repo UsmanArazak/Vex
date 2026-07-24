@@ -77,7 +77,7 @@ const DebtModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
           <div>
             <label className="block text-sm font-medium text-gray-500 mb-1">Direction</label>
             <select value={type} onChange={e => setType(e.target.value)} className="w-full border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-gold/50">
-              <option value="owed_to_me">Owed to Me</option>
+              <option value="owed_to_me">Owed</option>
               <option value="i_owe">I Owe</option>
             </select>
           </div>

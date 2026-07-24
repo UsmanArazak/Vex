@@ -46,7 +46,7 @@ const Debts = () => {
             <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
             </div>
-            <p className="text-xs font-bold uppercase text-amber-600/70 tracking-wider">Owe</p>
+            <p className="text-xs font-bold uppercase text-amber-600/70 tracking-wider">Owed</p>
           </div>
           <p className="text-2xl font-black text-amber-700">{formatCurrency(totalOwedToMe)}</p>
           <p className="text-xs text-amber-600/50 mt-1">{owedToMe.length} {owedToMe.length === 1 ? 'person' : 'people'}</p>
@@ -70,7 +70,7 @@ const Debts = () => {
           className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 ${
             activeTab === 'owed_to_me' ? 'bg-white shadow-sm text-brand-charcoal' : 'text-gray-400'
           }`}
-        >Owe</button>
+        >Owed</button>
         <button
           onClick={() => setActiveTab('i_owe')}
           className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 ${
