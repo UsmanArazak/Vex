@@ -3,6 +3,7 @@ import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
 import Goals from './pages/Goals';
+import Settings from './pages/Settings';
 
 function App() {
   const [currentPath, setCurrentPath] = useState('dashboard');
@@ -16,7 +17,7 @@ function App() {
       case 'goals':
         return <Goals />;
       case 'settings':
-        return <div className="p-6 pt-12"><h1 className="text-2xl font-bold mb-4">Settings</h1></div>;
+        return <Settings />;
       default:
         return null;
     }
