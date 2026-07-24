@@ -7,16 +7,7 @@ const Dashboard = ({ onNavigate }) => {
   const rawTransactions = getTransactions();
   const categories = getCategories();
   
-  const hasData = rawTransactions.length > 0;
-
-  // Mock data for initial empty state visualization if needed
-  const mockTransactions = [
-    { id: '1', amount: 4500, categoryId: 'cat-1', type: 'expense', date: new Date().toISOString() },
-    { id: '2', amount: 50000, categoryId: 'cat-5', type: 'income', date: new Date().toISOString() },
-    { id: '3', amount: 2000, categoryId: 'cat-2', type: 'expense', date: new Date().toISOString() },
-  ];
-  
-  const transactions = hasData ? rawTransactions : mockTransactions;
+  const transactions = rawTransactions;
 
   // Calculations
   const { totalBalance, todayExpense, currentMonthExpense } = useMemo(() => {
