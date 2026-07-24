@@ -7,9 +7,10 @@ const Me = () => {
   const transactions = getTransactions();
   const categories = getCategories();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [showSpending, setShowSpending] = useState(false);
+  const [showSpending, setShowSpending] = useState(true);
 
   const now = new Date();
+  const currentMonthName = format(now, 'MMMM yyyy');
   const formatCurrency = (val) => `₦${Number(val).toLocaleString()}`;
   const getCategory = (id) => categories.find(c => c.id === id) || { name: 'Other', color: '#ccc' };
 
@@ -37,7 +38,12 @@ const Me = () => {
       const total = transactions
         .filter(t => t.type === 'expense' && isSameMonth(parseISO(t.date), month))
         .reduce((acc, t) => acc + Number(t.amount), 0);
-      return { label: format(month, 'MMM'), total };
+      return { 
+        label: format(month, 'MMM'), 
+        fullMonth: format(month, 'MMMM yyyy'),
+        total,
+        isCurrent: i === 3
+      };
     });
   }, [transactions]);
 
@@ -48,7 +54,7 @@ const Me = () => {
       {/* Header */}
       <header className="flex justify-between items-center">
         <div>
-          <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">{format(now, 'MMMM yyyy')}</p>
+          <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Account & Insights</p>
           <h1 className="text-3xl font-bold text-brand-charcoal">Me</h1>
         </div>
         <div className="w-12 h-12 rounded-full bg-brand-gold flex items-center justify-center shadow-md">
@@ -60,13 +66,15 @@ const Me = () => {
       <div className="grid grid-cols-2 gap-3">
         <button
           onClick={() => setShowSpending(!showSpending)}
-          className="card p-5 border border-gray-100 shadow-sm text-left hover:shadow-md transition-shadow group"
+          className={`card p-5 border shadow-sm text-left transition-all group ${
+            showSpending ? 'border-brand-gold bg-amber-50/30' : 'border-gray-100 hover:shadow-md'
+          }`}
         >
           <div className="w-10 h-10 rounded-xl bg-brand-gold/20 flex items-center justify-center mb-3 group-hover:bg-brand-gold/30 transition-colors">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D2D2D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
           </div>
           <p className="font-bold text-brand-charcoal text-sm">My Spending</p>
-          <p className="text-xs text-gray-400 mt-0.5">Monthly breakdown</p>
+          <p className="text-xs text-gray-400 mt-0.5">{currentMonthName}</p>
         </button>
 
         <button
@@ -81,37 +89,56 @@ const Me = () => {
         </button>
       </div>
 
-      {/* Spending Section (collapsible) */}
+      {/* Spending Section */}
       {showSpending && (
         <div className="space-y-6 animate-fadeIn">
-          {/* Summary Cards */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="card p-4 border border-red-100 bg-red-50/50">
-              <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Spent</p>
-              <p className="text-xl font-bold text-red-500">{formatCurrency(monthExpense)}</p>
+          {/* Active Month Banner */}
+          <div className="card p-5 bg-gradient-to-br from-brand-charcoal to-gray-800 text-white shadow-md border-0">
+            <div className="flex justify-between items-center mb-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-brand-gold bg-brand-gold/10 px-2.5 py-1 rounded-full border border-brand-gold/20">
+                Active Month — {currentMonthName}
+              </span>
             </div>
-            <div className="card p-4 border border-green-100 bg-green-50/50">
-              <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Earned</p>
-              <p className="text-xl font-bold text-green-500">{formatCurrency(monthIncome)}</p>
+            <div className="grid grid-cols-2 gap-4 pt-2">
+              <div>
+                <p className="text-xs text-gray-400 font-medium mb-0.5">Total Spent</p>
+                <p className="text-2xl font-black text-red-400">{formatCurrency(monthExpense)}</p>
+              </div>
+              <div className="border-l border-gray-700/80 pl-4">
+                <p className="text-xs text-gray-400 font-medium mb-0.5">Total Earned</p>
+                <p className="text-2xl font-black text-emerald-400">{formatCurrency(monthIncome)}</p>
+              </div>
             </div>
           </div>
 
-          {/* 4-month bar trend */}
-          <section className="card p-5 border border-gray-100 shadow-sm">
-            <h2 className="font-bold text-base mb-4">Spending Trend</h2>
-            <div className="flex items-end justify-between gap-3 h-24">
-              {monthlyTrend.map((m, i) => {
-                const isCurrentMonth = i === 3;
-                const heightPct = maxTrend > 0 ? Math.max(8, Math.round((m.total / maxTrend) * 100)) : 8;
+          {/* Revamped 4-month Spending Trend */}
+          <section className="card p-5 border border-gray-100 shadow-sm bg-white">
+            <div className="flex justify-between items-center mb-4">
+              <div>
+                <h2 className="font-bold text-base text-brand-charcoal">4-Month Spending Trend</h2>
+                <p className="text-xs text-gray-400">Comparing your monthly expenses</p>
+              </div>
+            </div>
+            <div className="flex items-end justify-between gap-3 h-36 pt-4 pb-1">
+              {monthlyTrend.map((m) => {
+                const heightPct = maxTrend > 0 ? Math.max(12, Math.round((m.total / maxTrend) * 100)) : 12;
                 return (
-                  <div key={m.label} className="flex flex-col items-center gap-2 flex-1">
-                    <p className="text-xs font-bold text-gray-400">{formatCurrency(m.total)}</p>
-                    <div className="w-full rounded-xl transition-all" style={{
-                      height: `${heightPct}%`,
-                      backgroundColor: isCurrentMonth ? '#FFE066' : '#E5E7EB',
-                      minHeight: '8px'
-                    }} />
-                    <p className={`text-xs font-bold ${isCurrentMonth ? 'text-brand-charcoal' : 'text-gray-400'}`}>{m.label}</p>
+                  <div key={m.label} className="flex flex-col items-center gap-2 flex-1 h-full justify-end">
+                    <p className={`text-[11px] font-bold ${m.isCurrent ? 'text-brand-charcoal' : 'text-gray-400'}`}>
+                      {m.total > 0 ? formatCurrency(m.total) : '₦0'}
+                    </p>
+                    <div className="w-full relative flex items-end justify-center rounded-xl bg-gray-100 overflow-hidden h-full max-h-[90px]">
+                      <div 
+                        className={`w-full rounded-t-xl transition-all duration-500 ${
+                          m.isCurrent ? 'bg-gradient-to-t from-amber-400 to-brand-gold shadow-md' : 'bg-gray-300/80'
+                        }`} 
+                        style={{ height: `${heightPct}%` }} 
+                      />
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <p className={`text-xs font-bold ${m.isCurrent ? 'text-brand-charcoal' : 'text-gray-400'}`}>{m.label}</p>
+                      {m.isCurrent && <span className="w-1.5 h-1.5 bg-brand-gold rounded-full mt-0.5"></span>}
+                    </div>
                   </div>
                 );
               })}
