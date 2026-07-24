@@ -42,6 +42,8 @@ const CategoryModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
     onClose();
   };
 
+  if (!isOpen) return null;
+
   return createPortal(
     <div className="fixed inset-0 z-[110] flex flex-col justify-end bg-brand-charcoal/40 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white rounded-t-3xl p-6 w-full max-w-md mx-auto shadow-2xl animate-in slide-in-from-bottom-full duration-300">

@@ -8,14 +8,21 @@ import Me from './pages/Me';
 import TransactionModal from './components/TransactionModal';
 
 function App() {
-  const [currentPath, setCurrentPath] = useState('dashboard');
+  const [currentPath, setCurrentPath] = useState(() => {
+    return localStorage.getItem('vex_current_path') || 'dashboard';
+  });
+
+  const navigate = (path) => {
+    localStorage.setItem('vex_current_path', path);
+    setCurrentPath(path);
+  };
   const [isGlobalAddOpen, setIsGlobalAddOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
   const renderContent = () => {
     switch (currentPath) {
       case 'dashboard':
-        return <Dashboard onNavigate={setCurrentPath} />;
+        return <Dashboard onNavigate={navigate} />;
       case 'transactions':
         return <Transactions />;
       case 'goals':
@@ -33,7 +40,7 @@ function App() {
     <>
       <Layout 
         currentPath={currentPath} 
-        onNavigate={setCurrentPath} 
+        onNavigate={navigate} 
         onOpenAdd={() => setIsGlobalAddOpen(true)}
       >
         <div key={refreshKey}>
