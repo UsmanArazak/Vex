@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
+import Goals from './pages/Goals';
 
 function App() {
   const [currentPath, setCurrentPath] = useState('dashboard');
@@ -13,7 +14,7 @@ function App() {
       case 'transactions':
         return <Transactions />;
       case 'goals':
-        return <div className="p-6 pt-12"><h1 className="text-2xl font-bold mb-4">Savings Goals</h1></div>;
+        return <Goals />;
       case 'settings':
         return <div className="p-6 pt-12"><h1 className="text-2xl font-bold mb-4">Settings</h1></div>;
       default:
