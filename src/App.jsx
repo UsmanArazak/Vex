@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
 import Goals from './pages/Goals';
 import Settings from './pages/Settings';
+import Me from './pages/Me';
 import TransactionModal from './components/TransactionModal';
 
 function App() {
@@ -14,13 +15,15 @@ function App() {
   const renderContent = () => {
     switch (currentPath) {
       case 'dashboard':
-        return <Dashboard />;
+        return <Dashboard onNavigate={setCurrentPath} />;
       case 'transactions':
         return <Transactions />;
       case 'goals':
         return <Goals />;
       case 'settings':
         return <Settings />;
+      case 'me':
+        return <Me />;
       default:
         return null;
     }

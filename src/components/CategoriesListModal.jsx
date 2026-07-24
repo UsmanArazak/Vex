@@ -1,12 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { getCategories, saveCategories } from '../utils/storage';
 import CategoryModal from './CategoryModal';
 
 const CategoriesListModal = ({ isOpen, onClose }) => {
-  const [categories, setCategories] = useState(getCategories());
+  const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  // Refresh categories every time this modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setCategories(getCategories());
+    }
+  }, [isOpen]);
 
   const refreshCategories = () => {
     setCategories(getCategories());
