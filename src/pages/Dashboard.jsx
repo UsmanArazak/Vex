@@ -54,7 +54,10 @@ const Dashboard = ({ onNavigate }) => {
     <div className="p-6 pt-12 space-y-6">
       {/* Header */}
       <header className="flex justify-between items-center mb-2">
-        <h1 className="text-2xl font-bold text-brand-charcoal">Good day 👋</h1>
+        <div className="flex items-center gap-3">
+          <img src="/favicon.png" alt="Logo" className="w-10 h-10 object-contain rounded-xl shadow-sm" />
+          <h1 className="text-2xl font-bold text-brand-charcoal">Good day 👋</h1>
+        </div>
         <button
           onClick={() => onNavigate('me')}
           className="w-11 h-11 rounded-full bg-brand-gold flex items-center justify-center shadow-md active:scale-95 transition-transform"
