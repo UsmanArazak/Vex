@@ -52,16 +52,6 @@ const Dashboard = () => {
 
   return (
     <div className="p-6 pt-12 space-y-6">
-      <header className="flex justify-between items-center mb-6">
-        <div>
-          <p className="text-sm text-gray-500 font-medium mb-1">Total Balance</p>
-          <h1 className="text-3xl font-bold text-brand-charcoal">{formatCurrency(totalBalance)}</h1>
-        </div>
-        <div className="w-12 h-12 rounded-full bg-brand-gold flex items-center justify-center border-4 border-white shadow-sm">
-          <span className="font-bold text-brand-charcoal">Me</span>
-        </div>
-      </header>
-
       {/* Today's Focus Card */}
       <section className="card bg-brand-gold relative overflow-hidden shadow-[0_10px_30px_-10px_rgba(255,215,0,0.5)] border-0">
         <div className="relative z-10">
@@ -72,10 +62,7 @@ const Dashboard = () => {
             Today's Spendings
           </h2>
           <div className="mt-4">
-            <p className="text-3xl font-bold">{formatCurrency(todayExpense)}</p>
-            <p className="text-sm text-brand-charcoal/70 mt-1">
-              Out of {formatCurrency(currentMonthExpense)} this month
-            </p>
+            <p className="text-4xl font-bold">{formatCurrency(todayExpense)}</p>
           </div>
         </div>
         <div className="absolute -right-8 -top-8 w-32 h-32 bg-white/20 rounded-full blur-2xl"></div>

@@ -4,9 +4,12 @@ import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
 import Goals from './pages/Goals';
 import Settings from './pages/Settings';
+import TransactionModal from './components/TransactionModal';
 
 function App() {
   const [currentPath, setCurrentPath] = useState('dashboard');
+  const [isGlobalAddOpen, setIsGlobalAddOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const renderContent = () => {
     switch (currentPath) {
@@ -24,8 +27,19 @@ function App() {
   };
 
   return (
-    <Layout currentPath={currentPath} onNavigate={setCurrentPath}>
-      {renderContent()}
+    <Layout 
+      currentPath={currentPath} 
+      onNavigate={setCurrentPath} 
+      onOpenAdd={() => setIsGlobalAddOpen(true)}
+    >
+      <div key={refreshKey}>
+        {renderContent()}
+      </div>
+      <TransactionModal 
+        isOpen={isGlobalAddOpen}
+        onClose={() => setIsGlobalAddOpen(false)}
+        onSaved={() => setRefreshKey(k => k + 1)}
+      />
     </Layout>
   );
 }

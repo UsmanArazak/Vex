@@ -1,7 +1,7 @@
 import React from 'react';
 import { Home, List, Target, Settings, Plus } from 'lucide-react';
 
-const Layout = ({ children, currentPath, onNavigate }) => {
+const Layout = ({ children, currentPath, onNavigate, onOpenAdd }) => {
   const navItems = [
     { id: 'dashboard', icon: Home, label: 'Home' },
     { id: 'transactions', icon: List, label: 'Activity' },
@@ -12,7 +12,7 @@ const Layout = ({ children, currentPath, onNavigate }) => {
   return (
     <div className="flex justify-center min-h-screen bg-brand-gray w-full">
       {/* Mobile container - restricts width on desktop to look like an app */}
-      <div className="w-full max-w-md bg-brand-gray min-h-screen relative shadow-2xl flex flex-col">
+      <div className="w-full max-w-md bg-brand-gray h-screen relative shadow-2xl flex flex-col overflow-hidden">
         
         {/* Main Content Area */}
         <main className="flex-1 overflow-y-auto pb-24 hide-scrollbar">
@@ -21,7 +21,7 @@ const Layout = ({ children, currentPath, onNavigate }) => {
 
         {/* Floating Add Button */}
         <button 
-          onClick={() => onNavigate('transactions')}
+          onClick={onOpenAdd}
           className="absolute bottom-24 right-6 bg-brand-gold text-brand-charcoal p-4 rounded-full shadow-lg hover:shadow-xl transition-transform active:scale-95 z-20 flex items-center justify-center"
           aria-label="Add Transaction"
         >
