@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-brand-gray text-brand-charcoal antialiased min-h-screen font-sans;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-3xl p-6 shadow-soft;
+  }
+  
+  .btn-primary {
+    @apply bg-brand-gold text-brand-charcoal font-semibold rounded-full px-6 py-3 transition-transform active:scale-95 flex items-center justify-center shadow-md hover:shadow-lg;
+  }
+  
+  .btn-icon {
+    @apply bg-white text-brand-charcoal rounded-full p-2 shadow-soft hover:bg-gray-50 transition-colors active:scale-95;
+  }
+}
