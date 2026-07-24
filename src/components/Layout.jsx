@@ -21,6 +21,7 @@ const Layout = ({ children, currentPath, onNavigate }) => {
 
         {/* Floating Add Button */}
         <button 
+          onClick={() => onNavigate('transactions')}
           className="absolute bottom-24 right-6 bg-brand-gold text-brand-charcoal p-4 rounded-full shadow-lg hover:shadow-xl transition-transform active:scale-95 z-20 flex items-center justify-center"
           aria-label="Add Transaction"
         >
