@@ -8,6 +8,8 @@ const Goals = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeGoal, setActiveGoal] = useState(null);
 
+  const formatCurrency = (val) => `₦${Number(val).toLocaleString()}`;
+
   const refreshData = () => {
     setGoals(getGoals());
   };
@@ -29,7 +31,14 @@ const Goals = () => {
     refreshData();
   };
 
-  // Group by targetMonth (e.g., "2023-10")
+  // Summary totals
+  const { totalCost, completedCost, pendingCost } = useMemo(() => {
+    const withCost = goals.filter(g => g.cost);
+    const total = withCost.reduce((acc, g) => acc + g.cost, 0);
+    const completed = withCost.filter(g => g.isCompleted).reduce((acc, g) => acc + g.cost, 0);
+    return { totalCost: total, completedCost: completed, pendingCost: total - completed };
+  }, [goals]);
+
   const groupedGoals = useMemo(() => {
     const groups = {};
     
@@ -72,6 +81,20 @@ const Goals = () => {
         </button>
       </div>
 
+      {/* Total cost summary card */}
+      {totalCost > 0 && (
+        <div className="card bg-brand-charcoal text-white p-5 shadow-md border-0 flex items-center justify-between mb-6">
+          <div>
+            <p className="text-xs text-white/60 font-bold uppercase tracking-wider mb-1">Total Bucket Cost</p>
+            <p className="text-2xl font-bold">{formatCurrency(totalCost)}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-xs text-white/60 mb-1">Got ✅ {formatCurrency(completedCost)}</p>
+            <p className="text-xs text-white/60">Still want 🛒 {formatCurrency(pendingCost)}</p>
+          </div>
+        </div>
+      )}
+
       <div className="space-y-8">
         {Object.keys(groupedGoals).length > 0 ? (
           Object.keys(groupedGoals).map(monthStr => (
@@ -84,35 +107,42 @@ const Goals = () => {
                 {groupedGoals[monthStr].map(goal => (
                   <div 
                     key={goal.id} 
-                    className={`card p-4 flex items-center justify-between shadow-sm border border-gray-100 transition-all ${
+                    className={`card p-4 shadow-sm border border-gray-100 transition-all ${
                       goal.isCompleted ? 'opacity-60 bg-gray-50' : 'bg-white'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
-                      <button 
-                        onClick={() => toggleComplete(goal)}
-                        className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-colors ${
-                          goal.isCompleted ? 'bg-brand-charcoal border-brand-charcoal text-white' : 'border-gray-300 text-transparent'
-                        }`}
-                      >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                      </button>
-                      
-                      <div className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded-full" style={{ backgroundColor: goal.color }}></span>
-                        <h4 className={`font-bold text-brand-charcoal ${goal.isCompleted ? 'line-through text-gray-400' : ''}`}>
-                          {goal.name}
-                        </h4>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <button 
+                          onClick={() => toggleComplete(goal)}
+                          className={`w-6 h-6 shrink-0 rounded-md border-2 flex items-center justify-center transition-colors ${
+                            goal.isCompleted ? 'bg-brand-charcoal border-brand-charcoal text-white' : 'border-gray-300 text-transparent'
+                          }`}
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        </button>
+                        
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="w-3 h-3 shrink-0 rounded-full" style={{ backgroundColor: goal.color }}></span>
+                          <h4 className={`font-bold text-brand-charcoal truncate ${goal.isCompleted ? 'line-through text-gray-400' : ''}`}>
+                            {goal.name}
+                          </h4>
+                        </div>
                       </div>
-                    </div>
-                    
-                    <div className="flex gap-2">
-                      <button onClick={() => openEdit(goal)} className="p-1.5 text-gray-400 hover:bg-gray-100 hover:text-brand-charcoal rounded-lg">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                      </button>
-                      <button onClick={() => handleDelete(goal.id)} className="p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500 rounded-lg">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                      </button>
+                      
+                      <div className="flex items-center gap-2 shrink-0 ml-2">
+                        {goal.cost && (
+                          <span className="text-sm font-bold text-brand-charcoal bg-brand-gold/20 px-2 py-1 rounded-lg">
+                            {formatCurrency(goal.cost)}
+                          </span>
+                        )}
+                        <button onClick={() => openEdit(goal)} className="p-1.5 text-gray-400 hover:bg-gray-100 hover:text-brand-charcoal rounded-lg">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                        </button>
+                        <button onClick={() => handleDelete(goal.id)} className="p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500 rounded-lg">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}

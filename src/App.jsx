@@ -3,7 +3,7 @@ import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
 import Goals from './pages/Goals';
-import Settings from './pages/Settings';
+import Debts from './pages/Debts';
 import Me from './pages/Me';
 import TransactionModal from './components/TransactionModal';
 
@@ -20,8 +20,8 @@ function App() {
         return <Transactions />;
       case 'goals':
         return <Goals />;
-      case 'settings':
-        return <Settings />;
+      case 'debts':
+        return <Debts />;
       case 'me':
         return <Me />;
       default:

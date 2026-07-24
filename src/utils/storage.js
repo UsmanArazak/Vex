@@ -4,6 +4,7 @@ const STORAGE_KEYS = {
   TRANSACTIONS: 'vex_wallet_transactions',
   CATEGORIES: 'vex_wallet_categories',
   GOALS: 'vex_wallet_goals',
+  DEBTS: 'vex_wallet_debts',
 };
 
 const DEFAULT_CATEGORIES = [
@@ -94,25 +95,48 @@ export const deleteGoal = (id) => {
   return goals;
 };
 
-// Utility to clear all data
+// Debts
+export const getDebts = () => getData(STORAGE_KEYS.DEBTS, []);
+
+export const saveDebt = (debt) => {
+  const debts = getDebts();
+  const index = debts.findIndex(d => d.id === debt.id);
+  if (index >= 0) {
+    debts[index] = debt;
+  } else {
+    debts.push({ ...debt, id: crypto.randomUUID() });
+  }
+  setData(STORAGE_KEYS.DEBTS, debts);
+  return debts;
+};
+
+export const deleteDebt = (id) => {
+  const debts = getDebts().filter(d => d.id !== id);
+  setData(STORAGE_KEYS.DEBTS, debts);
+  return debts;
+};
+
+// Update clearAllData to also remove debts
 export const clearAllData = () => {
   localStorage.removeItem(STORAGE_KEYS.TRANSACTIONS);
   localStorage.removeItem(STORAGE_KEYS.CATEGORIES);
   localStorage.removeItem(STORAGE_KEYS.GOALS);
+  localStorage.removeItem(STORAGE_KEYS.DEBTS);
 };
 
-// Utility to export data
+// Extend exportData and importData
 export const exportData = () => {
   return {
     transactions: getTransactions(),
     categories: getCategories(),
     goals: getGoals(),
+    debts: getDebts(),
   };
 };
 
-// Utility to import data
 export const importData = (data) => {
   if (data.transactions) setData(STORAGE_KEYS.TRANSACTIONS, data.transactions);
   if (data.categories) setData(STORAGE_KEYS.CATEGORIES, data.categories);
   if (data.goals) setData(STORAGE_KEYS.GOALS, data.goals);
+  if (data.debts) setData(STORAGE_KEYS.DEBTS, data.debts);
 };

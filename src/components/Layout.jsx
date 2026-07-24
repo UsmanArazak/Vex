@@ -1,12 +1,12 @@
 import React from 'react';
-import { Home, List, Target, Settings, Plus } from 'lucide-react';
+import { Home, List, Target, Settings, Plus, Banknote } from 'lucide-react';
 
 const Layout = ({ children, currentPath, onNavigate, onOpenAdd }) => {
   const navItems = [
     { id: 'dashboard', icon: Home, label: 'Home' },
     { id: 'transactions', icon: List, label: 'Activity' },
     { id: 'goals', icon: Target, label: 'Goals' },
-    { id: 'settings', icon: Settings, label: 'Settings' },
+    { id: 'debts', icon: Banknote, label: 'Debts' },
   ];
 
   return (

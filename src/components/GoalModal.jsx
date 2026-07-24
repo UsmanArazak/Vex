@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 
 const GoalModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
   const [name, setName] = useState('');
+  const [cost, setCost] = useState('');
   const [targetMonth, setTargetMonth] = useState('');
   const [color, setColor] = useState('#FFE066');
 
@@ -14,10 +15,12 @@ const GoalModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
     if (isOpen) {
       if (initialData) {
         setName(initialData.name);
+        setCost(initialData.cost || '');
         setTargetMonth(initialData.targetMonth || format(new Date(), 'yyyy-MM'));
         setColor(initialData.color || '#FFE066');
       } else {
         setName('');
+        setCost('');
         setTargetMonth(format(new Date(), 'yyyy-MM'));
         setColor('#FFE066');
       }
@@ -31,6 +34,7 @@ const GoalModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
     const goal = {
       id: initialData?.id,
       name,
+      cost: cost ? Number(cost) : null,
       targetMonth, // format: "YYYY-MM"
       isCompleted: initialData?.isCompleted || false,
       color,
@@ -64,6 +68,17 @@ const GoalModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
               onChange={(e) => setName(e.target.value)}
               className="w-full text-2xl font-bold bg-transparent border-b-2 border-gray-200 focus:border-brand-gold outline-none py-2 transition-colors"
               placeholder="e.g. New Sneakers"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-500 mb-1">Estimated Cost (₦) <span className="text-gray-300">— optional</span></label>
+            <input
+              type="number"
+              value={cost}
+              onChange={(e) => setCost(e.target.value)}
+              className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-brand-gold/50 transition-all"
+              placeholder="0"
             />
           </div>
 
