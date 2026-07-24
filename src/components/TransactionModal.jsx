@@ -24,7 +24,7 @@ const TransactionModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
         setNote('');
       }
     }
-  }, [isOpen, initialData, categories]);
+  }, [isOpen, initialData]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -98,9 +98,13 @@ const TransactionModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
                   key={cat.id}
                   onClick={() => setCategoryId(cat.id)}
                   className={`p-2 rounded-xl text-xs font-semibold flex flex-col items-center gap-1 transition-all ${
-                    categoryId === cat.id ? 'ring-2 ring-brand-charcoal shadow-sm' : 'opacity-70 hover:opacity-100'
+                    categoryId === cat.id ? 'bg-white shadow-md scale-105 border border-brand-charcoal/10' : 'opacity-70 hover:opacity-100'
                   }`}
-                  style={{ backgroundColor: `${cat.color}20`, color: cat.color }} // 20% opacity bg
+                  style={{ 
+                    backgroundColor: categoryId === cat.id ? '#fff' : `${cat.color}20`, 
+                    color: categoryId === cat.id ? '#000' : cat.color,
+                    boxShadow: categoryId === cat.id ? `0 4px 12px ${cat.color}40` : 'none'
+                  }}
                 >
                   <span className="w-6 h-6 rounded-full flex items-center justify-center text-white" style={{ backgroundColor: cat.color }}>
                     {cat.name.charAt(0)}

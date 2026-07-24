@@ -22,14 +22,15 @@ const Layout = ({ children, currentPath, onNavigate, onOpenAdd }) => {
         {/* Floating Add Button */}
         <button 
           onClick={onOpenAdd}
-          className="absolute bottom-24 right-6 bg-brand-gold text-brand-charcoal p-4 rounded-full shadow-lg hover:shadow-xl transition-transform active:scale-95 z-20 flex items-center justify-center"
+          className="fixed bottom-24 bg-brand-gold text-brand-charcoal p-4 rounded-full shadow-lg hover:shadow-xl transition-transform active:scale-95 z-40 flex items-center justify-center"
+          style={{ right: 'calc(max(1.5rem, 50vw - 14rem + 1.5rem))' }}
           aria-label="Add Transaction"
         >
           <Plus size={24} strokeWidth={2.5} />
         </button>
 
         {/* Bottom Navigation */}
-        <nav className="absolute bottom-0 w-full bg-white rounded-t-3xl shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.05)] px-6 py-4 flex justify-between items-center z-10">
+        <nav className="fixed bottom-0 w-full max-w-md bg-white rounded-t-3xl shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.05)] px-6 py-4 flex justify-between items-center z-40">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentPath === item.id;
