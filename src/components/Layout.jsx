@@ -51,7 +51,7 @@ const Layout = ({ children, currentPath, onNavigate, onOpenAdd }) => {
 
         {/* Content column — mobile keeps the phone-frame look, desktop widens and drops the frame */}
         <div className="flex-1 flex justify-center">
-          <div className="w-full max-w-md md:max-w-2xl bg-brand-gray dark:bg-brand-dark h-screen md:h-auto md:min-h-screen relative shadow-2xl md:shadow-none flex flex-col overflow-hidden md:overflow-visible">
+          <div className="w-full max-w-md md:max-w-4xl bg-brand-gray dark:bg-brand-dark h-screen md:h-auto md:min-h-screen relative shadow-2xl md:shadow-none flex flex-col overflow-hidden md:overflow-visible">
 
             <main className="flex-1 overflow-y-auto md:overflow-visible pb-24 md:pb-16 hide-scrollbar">
               {children}
