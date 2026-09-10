@@ -2,11 +2,23 @@ import React, { useState, useRef } from 'react';
 import { exportData, importData, clearAllData } from '../utils/storage';
 import CategoriesListModal from '../components/CategoriesListModal';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import { useConfirm } from '../context/ConfirmContext';
+import { useTheme } from '../context/ThemeContext';
+
+const THEME_OPTIONS = [
+  { value: 'light', label: 'Light' },
+  { value: 'dark', label: 'Dark' },
+  { value: 'system', label: 'System' },
+];
 
 const Settings = () => {
   const [isCategoriesModalOpen, setIsCategoriesModalOpen] = useState(false);
   const fileInputRef = useRef(null);
   const { user, signOut } = useAuth();
+  const toast = useToast();
+  const confirm = useConfirm();
+  const { theme, setTheme } = useTheme();
 
   // Export Data
   const handleExport = async () => {
@@ -18,6 +30,7 @@ const Settings = () => {
     document.body.appendChild(downloadAnchorNode);
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
+    toast.success('Backup downloaded');
   };
 
   // Import Data
@@ -30,10 +43,10 @@ const Settings = () => {
       try {
         const jsonData = JSON.parse(event.target.result);
         await importData(jsonData);
-        alert('Data imported successfully! The app will now reload.');
-        window.location.reload();
+        toast.success('Data imported successfully — reloading…');
+        setTimeout(() => window.location.reload(), 900);
       } catch (err) {
-        alert('Failed to import data. Make sure the file is a valid backup JSON.');
+        toast.error('Failed to import data. Check the file is a valid backup JSON.');
         console.error(err);
       }
     };
@@ -43,38 +56,62 @@ const Settings = () => {
 
   // Clear Data
   const handleClearData = async () => {
-    if (window.confirm("WARNING! Are you absolutely sure you want to delete ALL your transactions, goals, and custom categories? This action CANNOT be undone.")) {
-      if (window.confirm("Final confirmation: Are you sure?")) {
-        await clearAllData();
-        alert('All data has been cleared. The app will now reload.');
-        window.location.reload();
-      }
-    }
+    const ok = await confirm({
+      title: 'Delete all data?',
+      message: 'This permanently deletes all your transactions, goals, debts, and custom categories. This cannot be undone.',
+      confirmLabel: 'Delete Everything',
+      danger: true,
+    });
+    if (!ok) return;
+    await clearAllData();
+    toast.success('All data cleared — reloading…');
+    setTimeout(() => window.location.reload(), 900);
   };
 
   return (
     <div className="p-6 pt-12 pb-24 space-y-8">
-      <h1 className="text-3xl font-bold text-brand-charcoal mb-8">Settings</h1>
+      <h1 className="text-3xl font-bold text-brand-charcoal dark:text-white mb-8">Settings</h1>
 
       {/* Account */}
       <section>
         <h2 className="font-bold text-xl mb-4">Account</h2>
-        <div className="card border border-gray-100 shadow-sm p-5">
-          <p className="text-sm text-gray-500 mb-4 truncate">Signed in as <span className="font-semibold text-brand-charcoal">{user?.email}</span></p>
+        <div className="card border border-gray-100 dark:border-brand-darkBorder shadow-sm p-5">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 truncate">Signed in as <span className="font-semibold text-brand-charcoal dark:text-white">{user?.email}</span></p>
           <button
             onClick={signOut}
-            className="w-full flex items-center justify-center gap-2 bg-gray-100 text-brand-charcoal font-semibold py-3 rounded-xl hover:bg-gray-200 transition-colors"
+            className="w-full flex items-center justify-center gap-2 bg-gray-100 dark:bg-brand-darkBorder text-brand-charcoal dark:text-white font-semibold py-3 rounded-xl hover:bg-gray-200 transition-colors"
           >
             Sign Out
           </button>
         </div>
       </section>
 
+      {/* Appearance */}
+      <section>
+        <h2 className="font-bold text-xl mb-4">Appearance</h2>
+        <div className="card border border-gray-100 dark:border-brand-darkBorder shadow-sm p-5">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Choose how Vex looks on this device.</p>
+          <div className="flex bg-gray-100 dark:bg-brand-darkBorder p-1 rounded-xl">
+            {THEME_OPTIONS.map(opt => (
+              <button
+                key={opt.value}
+                onClick={() => setTheme(opt.value)}
+                className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 ${
+                  theme === opt.value ? 'bg-white dark:bg-brand-darkCard shadow-sm text-brand-charcoal dark:text-white' : 'text-gray-400'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Categories */}
       <section>
         <h2 className="font-bold text-xl mb-4">Categories</h2>
-        <div className="card border border-gray-100 shadow-sm p-5">
-          <p className="text-sm text-gray-500 mb-4">Add, edit or delete your spending and income categories.</p>
+        <div className="card border border-gray-100 dark:border-brand-darkBorder shadow-sm p-5">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Add, edit or delete your spending and income categories.</p>
           <button
             onClick={() => setIsCategoriesModalOpen(true)}
             className="w-full flex items-center justify-center gap-2 bg-brand-charcoal text-white font-semibold py-3 rounded-xl hover:bg-gray-800 transition-colors"
@@ -88,8 +125,8 @@ const Settings = () => {
       {/* Data Backup */}
       <section>
         <h2 className="font-bold text-xl mb-4">Data Backup</h2>
-        <div className="card space-y-3 shadow-sm border border-gray-100 p-5">
-          <p className="text-sm text-gray-500 mb-2">Your data is stored locally. Export regularly to avoid losing it.</p>
+        <div className="card space-y-3 shadow-sm border border-gray-100 dark:border-brand-darkBorder p-5">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Your data is stored locally. Export regularly to avoid losing it.</p>
 
           <button
             onClick={handleExport}
@@ -107,7 +144,7 @@ const Settings = () => {
               onChange={handleImport}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             />
-            <button className="w-full flex items-center justify-center gap-2 bg-gray-100 text-brand-charcoal font-semibold py-3 rounded-xl hover:bg-gray-200 transition-colors">
+            <button className="w-full flex items-center justify-center gap-2 bg-gray-100 dark:bg-brand-darkBorder text-brand-charcoal dark:text-white font-semibold py-3 rounded-xl hover:bg-gray-200 transition-colors">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
               Import Backup (JSON)
             </button>
@@ -118,7 +155,7 @@ const Settings = () => {
       {/* Danger Zone */}
       <section>
         <h2 className="font-bold text-xl mb-4 text-red-500">Danger Zone</h2>
-        <div className="card shadow-sm border border-red-100 p-5 bg-red-50/30">
+        <div className="card shadow-sm border border-red-100 dark:border-red-900/40 p-5 bg-red-50/30 dark:bg-red-950/20">
           <button
             onClick={handleClearData}
             className="w-full bg-red-100 text-red-600 font-bold py-3 rounded-xl hover:bg-red-200 transition-colors"

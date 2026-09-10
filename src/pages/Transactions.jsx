@@ -2,11 +2,15 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { getTransactions, getCategories, deleteTransaction } from '../utils/storage';
 import { format, parseISO } from 'date-fns';
 import TransactionModal from '../components/TransactionModal';
+import { useConfirm } from '../context/ConfirmContext';
+import { useToast } from '../context/ToastContext';
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const confirm = useConfirm();
+  const toast = useToast();
 
   const [filterType, setFilterType] = useState('all'); // all, income, expense
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,10 +26,11 @@ const Transactions = () => {
   useEffect(() => { refreshData(); }, []);
 
   const handleDelete = async (id) => {
-    if (confirm("Are you sure you want to delete this transaction?")) {
-      await deleteTransaction(id);
-      refreshData();
-    }
+    const ok = await confirm({ title: 'Delete transaction?', confirmLabel: 'Delete', danger: true });
+    if (!ok) return;
+    await deleteTransaction(id);
+    toast.success('Transaction deleted');
+    refreshData();
   };
 
   const openEdit = (tx) => {
@@ -54,10 +59,10 @@ const Transactions = () => {
   return (
     <div className="p-6 pt-12">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-brand-charcoal">Activity</h1>
+        <h1 className="text-3xl font-bold text-brand-charcoal dark:text-white">Activity</h1>
         <button 
           onClick={() => { setEditingTx(null); setIsModalOpen(true); }}
-          className="bg-brand-gold text-brand-charcoal p-2 rounded-xl shadow-sm font-bold text-sm px-4"
+          className="bg-brand-gold text-brand-charcoal dark:text-white p-2 rounded-xl shadow-sm font-bold text-sm px-4"
         >
           + Add New
         </button>
@@ -85,21 +90,21 @@ const Transactions = () => {
         {Object.keys(groupedTransactions).length > 0 ? (
           Object.keys(groupedTransactions).map(dateStr => (
             <div key={dateStr}>
-              <h3 className="text-xs font-bold text-gray-400 mb-3 uppercase tracking-wider">
+              <h3 className="text-xs font-bold text-gray-400 dark:text-gray-500 mb-3 uppercase tracking-wider">
                 {format(parseISO(dateStr), 'MMMM d, yyyy')}
               </h3>
               <div className="space-y-3">
                 {groupedTransactions[dateStr].map(t => {
                   const cat = getCategory(t.categoryId);
                   return (
-                    <div key={t.id} className="card p-4 flex items-center justify-between shadow-sm border border-gray-100 relative group overflow-hidden">
+                    <div key={t.id} className="card p-4 flex items-center justify-between shadow-sm border border-gray-100 dark:border-brand-darkBorder relative group overflow-hidden">
                       <div className="flex items-center gap-3 relative z-10">
                         <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold shadow-inner" style={{ backgroundColor: cat.color }}>
                           {cat.name.charAt(0)}
                         </div>
                         <div>
-                          <h4 className="font-bold text-brand-charcoal">{cat.name}</h4>
-                          <p className="text-xs text-gray-400">{t.note || format(parseISO(t.date), 'h:mm a')}</p>
+                          <h4 className="font-bold text-brand-charcoal dark:text-white">{cat.name}</h4>
+                          <p className="text-xs text-gray-400 dark:text-gray-500">{t.note || format(parseISO(t.date), 'h:mm a')}</p>
                         </div>
                       </div>
                       <div className="text-right relative z-10 flex flex-col items-end gap-1">
@@ -108,8 +113,8 @@ const Transactions = () => {
                         </p>
                         {/* Actions (visible on hover or focus for desktop, tap for mobile) */}
                         <div className="flex gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                          <button onClick={() => openEdit(t)} className="text-xs text-gray-400 hover:text-brand-charcoal bg-gray-100 px-2 py-1 rounded">Edit</button>
-                          <button onClick={() => handleDelete(t.id)} className="text-xs text-gray-400 hover:text-red-500 bg-red-50 px-2 py-1 rounded">Del</button>
+                          <button onClick={() => openEdit(t)} className="text-xs text-gray-400 dark:text-gray-500 hover:text-brand-charcoal bg-gray-100 dark:bg-brand-darkBorder px-2 py-1 rounded">Edit</button>
+                          <button onClick={() => handleDelete(t.id)} className="text-xs text-gray-400 dark:text-gray-500 hover:text-red-500 bg-red-50 px-2 py-1 rounded">Del</button>
                         </div>
                       </div>
                     </div>
@@ -119,7 +124,7 @@ const Transactions = () => {
             </div>
           ))
         ) : (
-          <div className="text-center p-12 text-gray-400 bg-white rounded-3xl border border-dashed border-gray-200">
+          <div className="text-center p-12 text-gray-400 dark:text-gray-500 bg-white dark:bg-brand-darkCard rounded-3xl border border-dashed border-gray-200 dark:border-brand-darkBorder">
             No transactions found.
           </div>
         )}

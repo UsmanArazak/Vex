@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { getCategories, saveCategories } from '../utils/storage';
+import { useToast } from '../context/ToastContext';
 
 const CategoryModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
   const [name, setName] = useState('');
   const [type, setType] = useState('expense');
   const [color, setColor] = useState('#FF6B6B');
+  const toast = useToast();
 
   const presetColors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFE066', '#4CAF50', '#9C27B0', '#F9A826', '#3F51B5'];
 
@@ -44,8 +46,9 @@ const CategoryModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
       await saveCategories(categories);
       onSaved();
       onClose();
+      toast.success(initialData ? 'Category updated' : 'Category added');
     } catch (err) {
-      alert(err.message || 'Failed to save category');
+      toast.error(err.message || 'Failed to save category');
     } finally {
       setSaving(false);
     }
@@ -55,16 +58,16 @@ const CategoryModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
 
   return createPortal(
     <div className="fixed inset-0 z-[110] flex flex-col justify-end bg-brand-charcoal/40 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-t-3xl p-6 w-full max-w-md mx-auto shadow-2xl animate-in slide-in-from-bottom-full duration-300">
+      <div className="bg-white dark:bg-brand-darkCard rounded-t-3xl p-6 w-full max-w-md mx-auto shadow-2xl animate-in slide-in-from-bottom-full duration-300">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold">{initialData ? 'Edit' : 'Add'} Category</h2>
-          <button onClick={onClose} className="p-2 bg-gray-100 rounded-full text-gray-500 hover:text-brand-charcoal">
+          <button onClick={onClose} className="p-2 bg-gray-100 dark:bg-brand-darkBorder rounded-full text-gray-500 dark:text-gray-400 hover:text-brand-charcoal">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="flex bg-gray-100 p-1 rounded-xl">
+          <div className="flex bg-gray-100 dark:bg-brand-darkBorder p-1 rounded-xl">
             <button
               type="button"
               className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-colors ${type === 'expense' ? 'bg-white shadow-sm text-brand-charcoal' : 'text-gray-500'}`}
@@ -82,19 +85,19 @@ const CategoryModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-500 mb-1">Category Name</label>
+            <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Category Name</label>
             <input
               type="text"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-brand-gold/50 transition-all"
+              className="w-full bg-gray-50 dark:bg-brand-darkCard border border-gray-100 dark:border-brand-darkBorder rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-brand-gold/50 transition-all"
               placeholder="e.g. Groceries"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-500 mb-2">Color</label>
+            <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Color</label>
             <div className="flex flex-wrap gap-3">
               {presetColors.map(c => (
                 <button

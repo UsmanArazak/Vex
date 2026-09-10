@@ -40,50 +40,50 @@ const DebtModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
 
   return ReactDOM.createPortal(
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
-        <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-600" onClick={onClose}>✕</button>
+      <div className="bg-white dark:bg-brand-darkCard rounded-xl shadow-lg w-full max-w-md p-6 relative">
+        <button className="absolute top-2 right-2 text-gray-400 dark:text-gray-500 hover:text-gray-600" onClick={onClose}>✕</button>
         <h2 className="text-xl font-bold mb-4">{initialData ? 'Edit Debt' : 'Add Debt'}</h2>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-500 mb-1">Name</label>
+            <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Name</label>
             <input
               type="text"
               required
               value={name}
               onChange={e => setName(e.target.value)}
-              className="w-full border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-gold/50"
+              className="w-full border border-gray-200 dark:border-brand-darkBorder rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-gold/50"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-500 mb-1">Amount (₦)</label>
+            <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Amount (₦)</label>
             <input
               type="number"
               required
               value={amount}
               onChange={e => setAmount(e.target.value)}
-              className="w-full border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-gold/50"
+              className="w-full border border-gray-200 dark:border-brand-darkBorder rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-gold/50"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-500 mb-1">Date</label>
+            <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Date</label>
             <input
               type="date"
               required
               value={date}
               onChange={e => setDate(e.target.value)}
-              className="w-full border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-gold/50"
+              className="w-full border border-gray-200 dark:border-brand-darkBorder rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-gold/50"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-500 mb-1">Direction</label>
-            <select value={type} onChange={e => setType(e.target.value)} className="w-full border border-gray-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-gold/50">
+            <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Direction</label>
+            <select value={type} onChange={e => setType(e.target.value)} className="w-full border border-gray-200 dark:border-brand-darkBorder rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-gold/50">
               <option value="owed_to_me">Owed</option>
               <option value="i_owe">I Owe</option>
             </select>
           </div>
         </div>
         <div className="flex justify-end mt-6 space-x-3">
-          <button onClick={onClose} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Cancel</button>
+          <button onClick={onClose} className="px-4 py-2 bg-gray-100 dark:bg-brand-darkBorder text-gray-700 rounded-lg hover:bg-gray-200">Cancel</button>
           <button onClick={handleSave} className="px-4 py-2 bg-brand-charcoal text-white rounded-lg hover:bg-gray-800">Save</button>
         </div>
       </div>

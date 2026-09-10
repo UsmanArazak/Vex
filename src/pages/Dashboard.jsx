@@ -53,13 +53,13 @@ const Dashboard = ({ onNavigate }) => {
       <header className="flex justify-between items-center mb-2">
         <div className="flex items-center gap-3">
           <img src="/favicon.png" alt="Logo" className="w-10 h-10 object-contain rounded-xl shadow-sm" />
-          <h1 className="text-2xl font-bold text-brand-charcoal">Good day 👋</h1>
+          <h1 className="text-2xl font-bold text-brand-charcoal dark:text-white">Good day 👋</h1>
         </div>
         <button
           onClick={() => onNavigate('me')}
           className="w-11 h-11 rounded-full bg-brand-gold flex items-center justify-center shadow-md active:scale-95 transition-transform"
         >
-          <span className="font-black text-brand-charcoal text-sm">Me</span>
+          <span className="font-black text-brand-charcoal dark:text-white text-sm">Me</span>
         </button>
       </header>
 
@@ -90,14 +90,14 @@ const Dashboard = ({ onNavigate }) => {
             todaysActivity.map(t => {
               const cat = getCategory(t.categoryId);
               return (
-                <div key={t.id} className="card p-4 flex items-center justify-between shadow-sm border border-gray-100">
+                <div key={t.id} className="card p-4 flex items-center justify-between shadow-sm border border-gray-100 dark:border-brand-darkBorder">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold" style={{ backgroundColor: cat.color }}>
                       {cat.name.charAt(0)}
                     </div>
                     <div>
-                      <h4 className="font-bold text-brand-charcoal text-sm">{cat.name}</h4>
-                      <p className="text-xs text-gray-400">{format(parseISO(t.date), 'h:mm a')}</p>
+                      <h4 className="font-bold text-brand-charcoal dark:text-white text-sm">{cat.name}</h4>
+                      <p className="text-xs text-gray-400 dark:text-gray-500">{format(parseISO(t.date), 'h:mm a')}</p>
                     </div>
                   </div>
                   <div className="text-right">
@@ -109,7 +109,7 @@ const Dashboard = ({ onNavigate }) => {
               )
             })
           ) : (
-            <div className="text-center p-6 text-gray-400 text-sm bg-white rounded-3xl border border-dashed border-gray-200">
+            <div className="text-center p-6 text-gray-400 dark:text-gray-500 text-sm bg-white dark:bg-brand-darkCard rounded-3xl border border-dashed border-gray-200 dark:border-brand-darkBorder">
               No spendings yet today! 🎉
             </div>
           )}

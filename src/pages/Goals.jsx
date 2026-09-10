@@ -2,11 +2,15 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { getGoals, deleteGoal, saveGoal } from '../utils/storage';
 import GoalModal from '../components/GoalModal';
 import { format, parse } from 'date-fns';
+import { useConfirm } from '../context/ConfirmContext';
+import { useToast } from '../context/ToastContext';
 
 const Goals = () => {
   const [goals, setGoals] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeGoal, setActiveGoal] = useState(null);
+  const confirm = useConfirm();
+  const toast = useToast();
 
   const formatCurrency = (val) => `₦${Number(val).toLocaleString()}`;
 
@@ -17,10 +21,11 @@ const Goals = () => {
   useEffect(() => { refreshData(); }, []);
 
   const handleDelete = async (id) => {
-    if (confirm("Are you sure you want to delete this item?")) {
-      await deleteGoal(id);
-      refreshData();
-    }
+    const ok = await confirm({ title: 'Delete this item?', confirmLabel: 'Delete', danger: true });
+    if (!ok) return;
+    await deleteGoal(id);
+    toast.success('Item deleted');
+    refreshData();
   };
 
   const openEdit = (goal) => {
@@ -71,7 +76,7 @@ const Goals = () => {
   return (
     <div className="p-6 pt-12 pb-24 space-y-6">
       <div className="flex justify-between items-center mb-2">
-        <h1 className="text-3xl font-bold text-brand-charcoal">Bucket List</h1>
+        <h1 className="text-3xl font-bold text-brand-charcoal dark:text-white">Bucket List</h1>
         <button 
           onClick={() => { setActiveGoal(null); setIsModalOpen(true); }}
           className="bg-brand-charcoal text-white p-2 px-4 rounded-xl shadow-sm font-bold text-sm hover:bg-gray-800 transition-colors"
@@ -101,7 +106,7 @@ const Goals = () => {
                 {groupedActiveGoals[monthStr].map(goal => (
                   <div 
                     key={goal.id} 
-                    className="card p-4 shadow-sm border border-gray-100 bg-white transition-all hover:shadow-md"
+                    className="card p-4 shadow-sm border border-gray-100 dark:border-brand-darkBorder bg-white dark:bg-brand-darkCard transition-all hover:shadow-md"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -114,7 +119,7 @@ const Goals = () => {
                         
                         <div className="flex items-center gap-2 min-w-0">
                           <span className="w-3 h-3 shrink-0 rounded-full" style={{ backgroundColor: goal.color }}></span>
-                          <h4 className="font-bold text-brand-charcoal truncate">
+                          <h4 className="font-bold text-brand-charcoal dark:text-white truncate">
                             {goal.name}
                           </h4>
                         </div>
@@ -122,14 +127,14 @@ const Goals = () => {
                       
                       <div className="flex items-center gap-2 shrink-0 ml-2">
                         {goal.cost && (
-                          <span className="text-sm font-bold text-brand-charcoal bg-brand-gold/20 px-2 py-1 rounded-lg">
+                          <span className="text-sm font-bold text-brand-charcoal dark:text-white bg-brand-gold/20 px-2 py-1 rounded-lg">
                             {formatCurrency(goal.cost)}
                           </span>
                         )}
-                        <button onClick={() => openEdit(goal)} className="p-1.5 text-gray-400 hover:bg-gray-100 hover:text-brand-charcoal rounded-lg">
+                        <button onClick={() => openEdit(goal)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:bg-gray-100 hover:text-brand-charcoal rounded-lg">
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                         </button>
-                        <button onClick={() => handleDelete(goal.id)} className="p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500 rounded-lg">
+                        <button onClick={() => handleDelete(goal.id)} className="p-1.5 text-gray-400 dark:text-gray-500 hover:bg-red-50 hover:text-red-500 rounded-lg">
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                         </button>
                       </div>
@@ -140,8 +145,8 @@ const Goals = () => {
             </div>
           ))
         ) : (
-          <div className="text-center p-8 bg-white rounded-3xl border border-dashed border-gray-200">
-            <p className="text-gray-400 mb-4">Your bucket list is empty. What's next on your wish list?</p>
+          <div className="text-center p-8 bg-white dark:bg-brand-darkCard rounded-3xl border border-dashed border-gray-200 dark:border-brand-darkBorder">
+            <p className="text-gray-400 dark:text-gray-500 mb-4">Your bucket list is empty. What's next on your wish list?</p>
             <button onClick={() => { setActiveGoal(null); setIsModalOpen(true); }} className="text-brand-gold font-bold">Add your first item</button>
           </div>
         )}
@@ -149,13 +154,13 @@ const Goals = () => {
 
       {/* Completed Section */}
       {completedGoals.length > 0 && (
-        <div className="pt-6 border-t border-gray-200">
-          <h3 className="font-bold text-lg text-gray-500 mb-3">Completed ({completedGoals.length})</h3>
+        <div className="pt-6 border-t border-gray-200 dark:border-brand-darkBorder">
+          <h3 className="font-bold text-lg text-gray-500 dark:text-gray-400 mb-3">Completed ({completedGoals.length})</h3>
           <div className="space-y-3">
             {completedGoals.map(goal => (
               <div 
                 key={goal.id} 
-                className="card p-4 shadow-sm border border-gray-100 bg-gray-50/80 opacity-70 flex items-center justify-between"
+                className="card p-4 shadow-sm border border-gray-100 dark:border-brand-darkBorder bg-gray-50/80 dark:bg-brand-darkCard opacity-70 flex items-center justify-between"
               >
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   <button 
@@ -167,7 +172,7 @@ const Goals = () => {
                   
                   <div className="flex items-center gap-2 min-w-0">
                     <span className="w-3 h-3 shrink-0 rounded-full" style={{ backgroundColor: goal.color }}></span>
-                    <h4 className="font-bold text-gray-400 line-through truncate">
+                    <h4 className="font-bold text-gray-400 dark:text-gray-500 line-through truncate">
                       {goal.name}
                     </h4>
                   </div>
@@ -175,11 +180,11 @@ const Goals = () => {
                 
                 <div className="flex items-center gap-2 shrink-0 ml-2">
                   {goal.cost && (
-                    <span className="text-sm font-bold text-gray-400 bg-gray-200 px-2 py-1 rounded-lg">
+                    <span className="text-sm font-bold text-gray-400 dark:text-gray-500 bg-gray-200 dark:bg-brand-darkBorder px-2 py-1 rounded-lg">
                       {formatCurrency(goal.cost)}
                     </span>
                   )}
-                  <button onClick={() => handleDelete(goal.id)} className="p-1.5 text-gray-300 hover:text-red-500 rounded-lg">
+                  <button onClick={() => handleDelete(goal.id)} className="p-1.5 text-gray-300 dark:text-gray-600 hover:text-red-500 rounded-lg">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                   </button>
                 </div>

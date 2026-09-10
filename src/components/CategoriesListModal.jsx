@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { getCategories, deleteCategory } from '../utils/storage';
+import { useConfirm } from '../context/ConfirmContext';
+import { useToast } from '../context/ToastContext';
 import CategoryModal from './CategoryModal';
 
 const CategoriesListModal = ({ isOpen, onClose }) => {
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const confirm = useConfirm();
+  const toast = useToast();
 
   // Refresh categories every time this modal opens
   useEffect(() => {
@@ -25,10 +29,16 @@ const CategoriesListModal = ({ isOpen, onClose }) => {
   };
 
   const handleDelete = async (id) => {
-    if (confirm("Are you sure you want to delete this category? Transactions using this category won't be deleted, but they might show as 'Other'.")) {
-      await deleteCategory(id);
-      refreshCategories();
-    }
+    const ok = await confirm({
+      title: 'Delete category?',
+      message: "Transactions using this category won't be deleted, but they might show as 'Other'.",
+      confirmLabel: 'Delete',
+      danger: true,
+    });
+    if (!ok) return;
+    await deleteCategory(id);
+    toast.success('Category deleted');
+    refreshCategories();
   };
 
   const handleAddNew = () => {
@@ -41,17 +51,17 @@ const CategoriesListModal = ({ isOpen, onClose }) => {
   return createPortal(
     <>
       <div className="fixed inset-0 z-50 flex flex-col justify-end bg-brand-charcoal/40 backdrop-blur-sm animate-in fade-in duration-200">
-        <div className="bg-white rounded-t-3xl p-6 w-full max-w-md mx-auto shadow-2xl h-[80vh] flex flex-col animate-in slide-in-from-bottom-full duration-300">
+        <div className="bg-white dark:bg-brand-darkCard rounded-t-3xl p-6 w-full max-w-md mx-auto shadow-2xl h-[80vh] flex flex-col animate-in slide-in-from-bottom-full duration-300">
           <div className="flex justify-between items-center mb-6 shrink-0">
             <h2 className="text-xl font-bold">Manage Categories</h2>
-            <button onClick={onClose} className="p-2 bg-gray-100 rounded-full text-gray-500 hover:text-brand-charcoal">
+            <button onClick={onClose} className="p-2 bg-gray-100 dark:bg-brand-darkBorder rounded-full text-gray-500 dark:text-gray-400 hover:text-brand-charcoal">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
             </button>
           </div>
 
           <button 
             onClick={handleAddNew}
-            className="w-full bg-brand-gold text-brand-charcoal font-bold py-3 rounded-xl mb-4 shrink-0 shadow-sm"
+            className="w-full bg-brand-gold text-brand-charcoal dark:text-white font-bold py-3 rounded-xl mb-4 shrink-0 shadow-sm"
           >
             + Add New Category
           </button>
@@ -67,12 +77,12 @@ const CategoriesListModal = ({ isOpen, onClose }) => {
                     {cat.name.charAt(0)}
                   </div>
                   <div>
-                    <p className="font-bold text-sm text-brand-charcoal">{cat.name}</p>
-                    <p className="text-xs text-gray-400 capitalize">{cat.type}</p>
+                    <p className="font-bold text-sm text-brand-charcoal dark:text-white">{cat.name}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 capitalize">{cat.type}</p>
                   </div>
                 </div>
                 <div className="flex gap-1">
-                  <button onClick={() => handleEdit(cat)} className="text-sm text-gray-400 hover:text-brand-charcoal p-2 rounded-lg bg-gray-50 hover:bg-gray-100">
+                  <button onClick={() => handleEdit(cat)} className="text-sm text-gray-400 dark:text-gray-500 hover:text-brand-charcoal p-2 rounded-lg bg-gray-50 dark:bg-brand-darkCard hover:bg-gray-100">
                     Edit
                   </button>
                   <button onClick={() => handleDelete(cat.id)} className="text-sm text-red-400 hover:text-red-600 p-2 rounded-lg bg-red-50 hover:bg-red-100">

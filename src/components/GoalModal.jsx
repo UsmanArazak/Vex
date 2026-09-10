@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { saveGoal } from '../utils/storage';
+import { useToast } from '../context/ToastContext';
 import { format } from 'date-fns';
 
 const GoalModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
@@ -8,6 +9,7 @@ const GoalModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
   const [cost, setCost] = useState('');
   const [targetMonth, setTargetMonth] = useState('');
   const [color, setColor] = useState('#FFE066');
+  const toast = useToast();
 
   const presetColors = ['#FFE066', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#9C27B0'];
 
@@ -48,8 +50,9 @@ const GoalModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
       await saveGoal(goal);
       onSaved();
       onClose();
+      toast.success(initialData ? 'Item updated' : 'Added to bucket list');
     } catch (err) {
-      alert(err.message || 'Failed to save item');
+      toast.error(err.message || 'Failed to save item');
     } finally {
       setSaving(false);
     }
@@ -59,51 +62,51 @@ const GoalModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
 
   return createPortal(
     <div className="fixed inset-0 z-[100] flex flex-col justify-end bg-brand-charcoal/40 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-t-3xl p-6 w-full max-w-md mx-auto shadow-2xl animate-in slide-in-from-bottom-full duration-300">
+      <div className="bg-white dark:bg-brand-darkCard rounded-t-3xl p-6 w-full max-w-md mx-auto shadow-2xl animate-in slide-in-from-bottom-full duration-300">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold">{initialData ? 'Edit' : 'Add to'} Bucket List</h2>
-          <button onClick={onClose} className="p-2 bg-gray-100 rounded-full text-gray-500 hover:text-brand-charcoal">
+          <button onClick={onClose} className="p-2 bg-gray-100 dark:bg-brand-darkBorder rounded-full text-gray-500 dark:text-gray-400 hover:text-brand-charcoal">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-500 mb-1">What do you want to buy?</label>
+            <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">What do you want to buy?</label>
             <input
               type="text"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full text-2xl font-bold bg-transparent border-b-2 border-gray-200 focus:border-brand-gold outline-none py-2 transition-colors"
+              className="w-full text-2xl font-bold bg-transparent border-b-2 border-gray-200 dark:border-brand-darkBorder focus:border-brand-gold outline-none py-2 transition-colors"
               placeholder="e.g. New Sneakers"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-500 mb-1">Estimated Cost (₦) <span className="text-gray-300">— optional</span></label>
+            <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Estimated Cost (₦) <span className="text-gray-300 dark:text-gray-600">— optional</span></label>
             <input
               type="number"
               value={cost}
               onChange={(e) => setCost(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-brand-gold/50 transition-all"
+              className="w-full bg-gray-50 dark:bg-brand-darkCard border border-gray-100 dark:border-brand-darkBorder rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-brand-gold/50 transition-all"
               placeholder="0"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-500 mb-1">Target Month</label>
+            <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Target Month</label>
             <input
               type="month"
               required
               value={targetMonth}
               onChange={(e) => setTargetMonth(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-brand-gold/50 transition-all"
+              className="w-full bg-gray-50 dark:bg-brand-darkCard border border-gray-100 dark:border-brand-darkBorder rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-brand-gold/50 transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-500 mb-2">Color</label>
+            <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Color</label>
             <div className="flex gap-3">
               {presetColors.map(c => (
                 <button

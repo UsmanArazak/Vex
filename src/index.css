@@ -4,13 +4,13 @@
 
 @layer base {
   body {
-    @apply bg-brand-gray text-brand-charcoal antialiased min-h-screen font-sans;
+    @apply bg-brand-gray dark:bg-brand-dark text-brand-charcoal dark:text-gray-100 antialiased min-h-screen font-sans transition-colors duration-base;
   }
 }
 
 @layer components {
   .card {
-    @apply bg-white rounded-3xl p-6 shadow-soft;
+    @apply bg-white dark:bg-brand-darkCard rounded-3xl p-6 shadow-soft dark:shadow-none dark:border dark:border-brand-darkBorder transition-colors duration-base;
   }
   
   .btn-primary {
@@ -18,6 +18,21 @@
   }
   
   .btn-icon {
-    @apply bg-white text-brand-charcoal rounded-full p-2 shadow-soft hover:bg-gray-50 transition-colors active:scale-95;
+    @apply bg-white dark:bg-brand-darkCard text-brand-charcoal dark:text-gray-100 rounded-full p-2 shadow-soft dark:shadow-none dark:border dark:border-brand-darkBorder hover:bg-gray-50 dark:hover:bg-brand-darkBorder transition-colors active:scale-95;
   }
+
+  .skeleton {
+    @apply bg-gray-200 dark:bg-brand-darkBorder rounded-xl relative overflow-hidden;
+  }
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+    animation: shimmer 1.4s infinite;
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }

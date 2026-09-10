@@ -62,28 +62,28 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-brand-gray p-6">
-      <div className="w-full max-w-sm bg-white rounded-3xl shadow-soft p-8">
-        <h1 className="text-3xl font-bold text-brand-charcoal mb-1">Vex</h1>
-        <p className="text-gray-400 mb-6 text-sm">
+    <div className="min-h-screen flex items-center justify-center bg-brand-gray dark:bg-brand-dark p-6">
+      <div className="w-full max-w-sm bg-white dark:bg-brand-darkCard rounded-3xl shadow-soft p-8">
+        <h1 className="text-3xl font-bold text-brand-charcoal dark:text-white mb-1">Vex</h1>
+        <p className="text-gray-400 dark:text-gray-500 mb-6 text-sm">
           {mode === 'login' ? 'Welcome back' : 'Create your account'}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Email</label>
+            <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Email</label>
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full mt-1 p-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-gold"
+              className="w-full mt-1 p-3 rounded-xl border border-gray-200 dark:border-brand-darkBorder focus:outline-none focus:ring-2 focus:ring-brand-gold"
               placeholder="you@example.com"
             />
           </div>
 
           <div>
-            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Password</label>
+            <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Password</label>
             <div className="relative mt-1">
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -91,13 +91,13 @@ const Auth = () => {
                 minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-3 pr-11 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-gold"
+                className="w-full p-3 pr-11 rounded-xl border border-gray-200 dark:border-brand-darkBorder focus:outline-none focus:ring-2 focus:ring-brand-gold"
                 placeholder="••••••••"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-charcoal transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-brand-charcoal transition-colors"
                 tabIndex={-1}
               >
                 <EyeIcon open={showPassword} />
@@ -107,7 +107,7 @@ const Auth = () => {
 
           {mode === 'signup' && (
             <div>
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Confirm Password</label>
+              <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Confirm Password</label>
               <div className="relative mt-1">
                 <input
                   type={showConfirmPassword ? 'text' : 'password'}
@@ -115,13 +115,13 @@ const Auth = () => {
                   minLength={6}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full p-3 pr-11 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-gold"
+                  className="w-full p-3 pr-11 rounded-xl border border-gray-200 dark:border-brand-darkBorder focus:outline-none focus:ring-2 focus:ring-brand-gold"
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-brand-charcoal transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-brand-charcoal transition-colors"
                   tabIndex={-1}
                 >
                   <EyeIcon open={showConfirmPassword} />
@@ -143,7 +143,7 @@ const Auth = () => {
 
         <button
           onClick={switchMode}
-          className="w-full text-center text-sm text-gray-500 mt-5 hover:text-brand-charcoal transition-colors"
+          className="w-full text-center text-sm text-gray-500 dark:text-gray-400 mt-5 hover:text-brand-charcoal transition-colors"
         >
           {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
           <span className="font-bold text-brand-gold">{mode === 'login' ? 'Sign up' : 'Log in'}</span>
