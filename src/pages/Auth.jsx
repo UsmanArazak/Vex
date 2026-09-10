@@ -69,11 +69,13 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-brand-gray dark:bg-brand-dark p-6 relative overflow-hidden">
-      {/* Simple background decoration */}
-      <div className="absolute -top-24 -left-24 w-72 h-72 bg-brand-gold/20 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-32 -right-20 w-80 h-80 bg-brand-gold/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-1/3 right-10 w-24 h-24 border-2 border-brand-gold/20 rounded-3xl rotate-12 hidden md:block pointer-events-none" />
-      <div className="absolute bottom-1/4 left-10 w-14 h-14 border-2 border-brand-charcoal/10 dark:border-white/10 rounded-full hidden md:block pointer-events-none" />
+      {/* Background decoration */}
+      <div className="absolute -top-20 -left-20 w-80 h-80 bg-brand-gold/40 rounded-full blur-2xl pointer-events-none" />
+      <div className="absolute -bottom-28 -right-16 w-96 h-96 bg-brand-gold/25 rounded-full blur-2xl pointer-events-none" />
+      <div className="absolute top-1/4 right-6 md:right-16 w-16 h-16 md:w-24 md:h-24 border-[3px] border-brand-gold/50 rounded-3xl rotate-12 pointer-events-none" />
+      <div className="absolute bottom-1/4 left-6 md:left-16 w-10 h-10 md:w-16 md:h-16 border-[3px] border-brand-charcoal/25 dark:border-white/25 rounded-full pointer-events-none" />
+      <div className="absolute top-1/2 left-8 w-3 h-3 bg-brand-gold/60 rounded-full hidden md:block pointer-events-none" />
+      <div className="absolute bottom-1/3 right-1/4 w-2.5 h-2.5 bg-brand-charcoal/20 dark:bg-white/20 rounded-full hidden md:block pointer-events-none" />
 
       <div className="w-full max-w-sm bg-white dark:bg-brand-darkCard rounded-3xl shadow-soft p-8 relative z-10">
         <h1 className="text-3xl font-bold text-brand-charcoal dark:text-white mb-1">Mopal</h1>
