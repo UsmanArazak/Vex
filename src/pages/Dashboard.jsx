@@ -1,20 +1,36 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, AreaChart, Area, XAxis, Tooltip, YAxis } from 'recharts';
-import { getTransactions, getCategories } from '../utils/storage';
+import { getTransactions, getCategories, getBudgets } from '../utils/storage';
 import { format, subMonths, isSameMonth, isToday, parseISO } from 'date-fns';
 import { SkeletonLine, SkeletonList } from '../components/ui/Skeleton';
+import { useToast } from '../context/ToastContext';
 
 const Dashboard = ({ onNavigate }) => {
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const toast = useToast();
 
   useEffect(() => {
     (async () => {
-      const [txs, cats] = await Promise.all([getTransactions(), getCategories()]);
+      const currentMonthKey = format(new Date(), 'yyyy-MM');
+      const [txs, cats, budgets] = await Promise.all([getTransactions(), getCategories(), getBudgets(currentMonthKey)]);
       setTransactions(txs);
       setCategories(cats);
       setLoading(false);
+
+      // Gentle one-time budget alert for anything over limit this month
+      if (budgets.length > 0) {
+        const monthTxs = txs.filter(t => t.type === 'expense' && isSameMonth(parseISO(t.date), new Date()));
+        const overspent = budgets.filter(b => {
+          const spent = monthTxs.filter(t => t.categoryId === b.categoryId).reduce((s, t) => s + Number(t.amount), 0);
+          return spent > b.limitAmount;
+        });
+        if (overspent.length > 0) {
+          const names = overspent.map(b => cats.find(c => c.id === b.categoryId)?.name).filter(Boolean);
+          toast.info(`Over budget this month: ${names.join(', ')}`, 5000);
+        }
+      }
     })();
   }, []);
 

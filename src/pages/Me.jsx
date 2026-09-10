@@ -1,24 +1,32 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { getTransactions, getCategories } from '../utils/storage';
+import { getTransactions, getCategories, getBudgets } from '../utils/storage';
 import { format, parseISO, isSameMonth, subMonths } from 'date-fns';
 import SettingsModal from '../components/SettingsModal';
+import BudgetModal from '../components/BudgetModal';
 import { SkeletonLine, SkeletonList } from '../components/ui/Skeleton';
 
 const Me = () => {
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [budgets, setBudgets] = useState([]);
+  const [budgetModalCategory, setBudgetModalCategory] = useState(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [showSpending, setShowSpending] = useState(true);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    (async () => {
-      const [txs, cats] = await Promise.all([getTransactions(), getCategories()]);
-      setTransactions(txs);
-      setCategories(cats);
-      setLoading(false);
-    })();
-  }, []);
+  const currentMonthKey = format(new Date(), 'yyyy-MM');
+
+  const loadAll = async () => {
+    const [txs, cats, buds] = await Promise.all([getTransactions(), getCategories(), getBudgets(currentMonthKey)]);
+    setTransactions(txs);
+    setCategories(cats);
+    setBudgets(buds);
+    setLoading(false);
+  };
+
+  useEffect(() => { loadAll(); }, []);
+
+  const getBudgetForCategory = (categoryId) => budgets.find(b => b.categoryId === categoryId) || null;
 
   const now = new Date();
   const currentMonthName = format(now, 'MMMM yyyy');
@@ -165,6 +173,10 @@ const Me = () => {
               <div className="space-y-3">
                 {byCategory.map(({ cat, total, count }) => {
                   const pct = monthExpense > 0 ? Math.round((total / monthExpense) * 100) : 0;
+                  const budget = getBudgetForCategory(cat.id);
+                  const budgetPct = budget ? Math.min(100, Math.round((total / budget.limitAmount) * 100)) : 0;
+                  const isOver = budget && total > budget.limitAmount;
+                  const barColor = isOver ? '#EF4444' : budgetPct >= 70 ? '#F59E0B' : '#4CAF50';
                   return (
                     <div key={cat.id} className="card p-4 border border-gray-100 dark:border-brand-darkBorder shadow-sm">
                       <div className="flex justify-between items-center mb-2">
@@ -185,6 +197,31 @@ const Me = () => {
                       <div className="h-1.5 w-full bg-gray-100 dark:bg-brand-darkBorder rounded-full overflow-hidden">
                         <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, backgroundColor: cat.color }} />
                       </div>
+
+                      {/* Budget row */}
+                      <div className="mt-3 pt-3 border-t border-gray-100 dark:border-brand-darkBorder">
+                        {budget ? (
+                          <button onClick={() => setBudgetModalCategory(cat)} className="w-full text-left">
+                            <div className="flex justify-between items-center mb-1.5">
+                              <span className={`text-xs font-bold ${isOver ? 'text-danger' : 'text-gray-500 dark:text-gray-400'}`}>
+                                {isOver ? `Over by ${formatCurrency(total - budget.limitAmount)}` : `${formatCurrency(budget.limitAmount - total)} left`}
+                              </span>
+                              <span className="text-xs text-gray-400 dark:text-gray-500">Budget: {formatCurrency(budget.limitAmount)}</span>
+                            </div>
+                            <div className="h-1.5 w-full bg-gray-100 dark:bg-brand-darkBorder rounded-full overflow-hidden">
+                              <div className="h-full rounded-full transition-all duration-700" style={{ width: `${budgetPct}%`, backgroundColor: barColor }} />
+                            </div>
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => setBudgetModalCategory(cat)}
+                            className="text-xs font-bold text-brand-goldDark dark:text-brand-gold flex items-center gap-1"
+                          >
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                            Set a budget
+                          </button>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
@@ -199,6 +236,14 @@ const Me = () => {
       )}
 
       <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      <BudgetModal
+        isOpen={!!budgetModalCategory}
+        onClose={() => setBudgetModalCategory(null)}
+        category={budgetModalCategory}
+        month={currentMonthKey}
+        existingBudget={budgetModalCategory ? getBudgetForCategory(budgetModalCategory.id) : null}
+        onSaved={loadAll}
+      />
     </div>
   );
 };

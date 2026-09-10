@@ -157,6 +157,42 @@ export const deleteDebt = async (id) => {
   return getDebts();
 };
 
+// ---------- Budgets ----------
+export const getBudgets = async (month) => {
+  let query = supabase.from('budgets').select('*');
+  if (month) query = query.eq('month', month);
+  const { data, error } = await query;
+  if (error) throw error;
+  return (data || []).map(b => ({
+    id: b.id,
+    categoryId: b.category_id,
+    month: b.month,
+    limitAmount: b.limit_amount,
+  }));
+};
+
+export const saveBudget = async (budget) => {
+  const user = await requireUser();
+  const row = {
+    ...(budget.id ? { id: budget.id } : {}),
+    user_id: user.id,
+    category_id: budget.categoryId,
+    month: budget.month,
+    limit_amount: budget.limitAmount,
+  };
+  // Upsert on the (user_id, category_id, month) unique constraint so setting
+  // a budget for a category+month that already has one just updates it.
+  const { error } = await supabase
+    .from('budgets')
+    .upsert(row, { onConflict: 'user_id,category_id,month' });
+  if (error) throw error;
+};
+
+export const deleteBudget = async (id) => {
+  const { error } = await supabase.from('budgets').delete().eq('id', id);
+  if (error) throw error;
+};
+
 // ---------- Bulk operations ----------
 export const clearAllData = async () => {
   const user = await requireUser();
@@ -164,17 +200,19 @@ export const clearAllData = async () => {
     supabase.from('transactions').delete().eq('user_id', user.id),
     supabase.from('goals').delete().eq('user_id', user.id),
     supabase.from('debts').delete().eq('user_id', user.id),
+    supabase.from('budgets').delete().eq('user_id', user.id),
   ]);
 };
 
 export const exportData = async () => {
-  const [transactions, categories, goals, debts] = await Promise.all([
+  const [transactions, categories, goals, debts, budgets] = await Promise.all([
     getTransactions(),
     getCategories(),
     getGoals(),
     getDebts(),
+    getBudgets(),
   ]);
-  return { transactions, categories, goals, debts };
+  return { transactions, categories, goals, debts, budgets };
 };
 
 export const importData = async (data) => {
@@ -182,4 +220,5 @@ export const importData = async (data) => {
   if (data.transactions) await Promise.all(data.transactions.map(t => saveTransaction(t)));
   if (data.goals) await Promise.all(data.goals.map(g => saveGoal(g)));
   if (data.debts) await Promise.all(data.debts.map(d => saveDebt(d)));
+  if (data.budgets) await Promise.all(data.budgets.map(b => saveBudget(b)));
 };
