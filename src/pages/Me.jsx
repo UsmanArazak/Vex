@@ -32,44 +32,55 @@ const BackHeader = ({ title, onBack }) => (
 
 // ============================= HUB =============================
 const MeHub = ({ user, onNavigate, onSignOut }) => (
-  <div className="p-6 pt-12 pb-24 space-y-6">
-    <header className="flex items-center gap-3">
-      <div className="w-14 h-14 rounded-full bg-brand-gold flex items-center justify-center shadow-md shrink-0">
-        <span className="font-black text-brand-charcoal text-lg">{(user?.email || '?').charAt(0).toUpperCase()}</span>
-      </div>
-      <div className="min-w-0">
-        <p className="text-xs text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">Signed in as</p>
-        <p className="font-bold text-brand-charcoal dark:text-white truncate">{user?.email}</p>
-      </div>
-    </header>
-
-    <div className="grid grid-cols-2 gap-3">
-      <button
-        onClick={() => onNavigate('spending')}
-        className="card p-5 border border-gray-100 dark:border-brand-darkBorder shadow-sm text-left hover:shadow-md transition-shadow group"
-      >
-        <div className="w-10 h-10 rounded-xl bg-brand-gold/20 flex items-center justify-center mb-3 group-hover:bg-brand-gold/30 transition-colors">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D2D2D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+  <div className="min-h-full flex flex-col p-6 pt-12 pb-6">
+    <div className="space-y-6">
+      <header className="flex items-center gap-3">
+        <div className="w-14 h-14 rounded-full bg-brand-gold flex items-center justify-center shadow-md shrink-0">
+          <span className="font-black text-brand-charcoal text-lg">{(user?.email || '?').charAt(0).toUpperCase()}</span>
         </div>
-        <p className="font-bold text-brand-charcoal dark:text-white text-sm">My Spending</p>
-        <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Insights & budgets</p>
-      </button>
-
-      <button
-        onClick={() => onNavigate('settings')}
-        className="card p-5 border border-gray-100 dark:border-brand-darkBorder shadow-sm text-left hover:shadow-md transition-shadow group"
-      >
-        <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-brand-darkBorder flex items-center justify-center mb-3 group-hover:bg-gray-200 transition-colors">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D2D2D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <div className="min-w-0">
+          <p className="text-xs text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">Signed in as</p>
+          <p className="font-bold text-brand-charcoal dark:text-white truncate">{user?.email}</p>
         </div>
-        <p className="font-bold text-brand-charcoal dark:text-white text-sm">Settings</p>
-        <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Appearance, categories & more</p>
-      </button>
+      </header>
+
+      <div className="grid grid-cols-2 gap-3">
+        <button
+          onClick={() => onNavigate('spending')}
+          className="card p-5 border border-gray-100 dark:border-brand-darkBorder shadow-sm text-left hover:shadow-md transition-shadow group"
+        >
+          <div className="w-10 h-10 rounded-xl bg-brand-gold/20 flex items-center justify-center mb-3 group-hover:bg-brand-gold/30 transition-colors">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D2D2D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <p className="font-bold text-brand-charcoal dark:text-white text-sm">My Spending</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Insights & budgets</p>
+        </button>
+
+        <button
+          onClick={() => onNavigate('settings')}
+          className="card p-5 border border-gray-100 dark:border-brand-darkBorder shadow-sm text-left hover:shadow-md transition-shadow group"
+        >
+          <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-brand-darkBorder flex items-center justify-center mb-3 group-hover:bg-gray-200 transition-colors">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D2D2D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </div>
+          <p className="font-bold text-brand-charcoal dark:text-white text-sm">Settings</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Appearance, categories & more</p>
+        </button>
+      </div>
     </div>
 
     <button
       onClick={onSignOut}
-      className="w-full flex items-center justify-center gap-2 bg-gray-100 dark:bg-brand-darkBorder text-brand-charcoal dark:text-white font-semibold py-3 rounded-xl hover:bg-gray-200 transition-colors mt-4"
+      className="md:hidden sticky bottom-4 z-10 mt-auto w-full flex items-center justify-center gap-2 bg-brand-gold text-brand-charcoal font-bold py-3.5 rounded-xl shadow-lg hover:shadow-xl active:scale-[0.98] transition-all"
+    >
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sign Out
+    </button>
+
+    {/* Desktop still needs a way to sign out on this page even though the sidebar has one too */}
+    <button
+      onClick={onSignOut}
+      className="hidden md:flex w-full items-center justify-center gap-2 bg-gray-100 dark:bg-brand-darkBorder text-brand-charcoal dark:text-white font-semibold py-3 rounded-xl hover:bg-gray-200 transition-colors mt-6"
     >
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       Sign Out

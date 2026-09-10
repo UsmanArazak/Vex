@@ -5,7 +5,7 @@ import { format, subMonths, isSameMonth, isToday, parseISO } from 'date-fns';
 import { SkeletonLine, SkeletonList } from '../components/ui/Skeleton';
 import { useToast } from '../context/ToastContext';
 
-const Dashboard = ({ onNavigate }) => {
+const Dashboard = ({ onNavigate, onOpenAdd }) => {
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -79,6 +79,13 @@ const Dashboard = ({ onNavigate }) => {
           className="md:hidden w-11 h-11 rounded-full bg-brand-gold flex items-center justify-center shadow-md active:scale-95 transition-transform"
         >
           <span className="font-black text-brand-charcoal dark:text-white text-sm">Me</span>
+        </button>
+        <button
+          onClick={onOpenAdd}
+          className="hidden md:flex btn-primary"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="mr-1.5"><path d="M12 5v14M5 12h14"/></svg>
+          Add Transaction
         </button>
       </header>
 

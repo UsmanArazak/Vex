@@ -44,7 +44,7 @@ function App() {
   const renderContent = () => {
     switch (currentPath) {
       case 'dashboard':
-        return <Dashboard onNavigate={navigate} />;
+        return <Dashboard onNavigate={navigate} onOpenAdd={() => setIsGlobalAddOpen(true)} />;
       case 'transactions':
         return <Transactions />;
       case 'goals':
@@ -100,7 +100,7 @@ function App() {
         onNavigate={navigate} 
         onOpenAdd={() => setIsGlobalAddOpen(true)}
       >
-        <div key={refreshKey}>
+        <div key={refreshKey} className="h-full">
           {renderContent()}
         </div>
       </Layout>

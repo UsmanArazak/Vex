@@ -1,7 +1,9 @@
 import React from 'react';
-import { Home, List, Target, Settings, Plus, Banknote, User } from 'lucide-react';
+import { Home, List, Target, Settings, Plus, Banknote, User, LogOut } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const Layout = ({ children, currentPath, onNavigate, onOpenAdd }) => {
+  const { signOut } = useAuth();
   // Mobile bottom nav stays exactly as-is — "Me" is intentionally not here.
   const navItems = [
     { id: 'dashboard', icon: Home, label: 'Home' },
@@ -47,10 +49,20 @@ const Layout = ({ children, currentPath, onNavigate, onOpenAdd }) => {
             })}
           </nav>
 
-          <button onClick={onOpenAdd} className="btn-primary w-full mt-4">
-            <Plus size={18} strokeWidth={2.5} className="mr-1.5" />
-            Add Transaction
-          </button>
+          {currentPath === 'dashboard' ? (
+            <button
+              onClick={signOut}
+              className="w-full flex items-center justify-center gap-2 bg-gray-100 dark:bg-brand-darkBorder text-brand-charcoal dark:text-white font-semibold py-3 rounded-xl hover:bg-gray-200 transition-colors mt-4"
+            >
+              <LogOut size={18} strokeWidth={2} />
+              Sign Out
+            </button>
+          ) : (
+            <button onClick={onOpenAdd} className="btn-primary w-full mt-4">
+              <Plus size={18} strokeWidth={2.5} className="mr-1.5" />
+              Add Transaction
+            </button>
+          )}
         </aside>
 
         {/* Content column — mobile keeps the phone-frame look, desktop widens and drops the frame */}
