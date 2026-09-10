@@ -299,7 +299,7 @@ const SettingsScreen = ({ onBack }) => {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
     const a = document.createElement('a');
     a.setAttribute("href", dataStr);
-    a.setAttribute("download", `vex_wallet_backup_${new Date().toISOString().split('T')[0]}.json`);
+    a.setAttribute("download", `mopal_backup_${new Date().toISOString().split('T')[0]}.json`);
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -346,7 +346,7 @@ const SettingsScreen = ({ onBack }) => {
       <section>
         <h2 className="font-bold text-xl mb-4">Appearance</h2>
         <div className="card border border-gray-100 dark:border-brand-darkBorder shadow-sm p-5">
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Choose how Vex looks on this device.</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Choose how Mopal looks on this device.</p>
           <div className="flex bg-gray-100 dark:bg-brand-darkBorder p-1 rounded-xl">
             {THEME_OPTIONS.map(opt => (
               <button

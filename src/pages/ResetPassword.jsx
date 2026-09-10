@@ -38,7 +38,7 @@ const ResetPassword = () => {
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
             </div>
             <h1 className="text-xl font-bold text-brand-charcoal dark:text-white mb-2">Password updated</h1>
-            <p className="text-sm text-gray-400 dark:text-gray-500">You're all set — taking you into Vex now.</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500">You're all set — taking you into Mopal now.</p>
           </div>
         ) : (
           <>

@@ -38,7 +38,7 @@ const Onboarding = ({ onComplete }) => {
         await supabase.auth.updateUser({ data: { monthly_income_estimate: Number(income) } });
       }
       await markOnboarded();
-      toast.success('You\'re all set — welcome to Vex!');
+      toast.success('You\'re all set — welcome to Mopal!');
       onComplete();
     } catch (err) {
       toast.error(err.message || 'Something went wrong, but you can adjust this later in Settings');
@@ -67,9 +67,9 @@ const Onboarding = ({ onComplete }) => {
         {step === 'welcome' && (
           <div className="animate-scale-in">
             <div className="w-14 h-14 rounded-2xl bg-brand-gold flex items-center justify-center mb-5">
-              <span className="text-2xl font-black text-brand-charcoal">V</span>
+              <span className="text-2xl font-black text-brand-charcoal">M</span>
             </div>
-            <h1 className="text-2xl font-bold text-brand-charcoal dark:text-white mb-2">Welcome to Vex</h1>
+            <h1 className="text-2xl font-bold text-brand-charcoal dark:text-white mb-2">Welcome to Mopal</h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">
               Let's set up your money in under a minute — spending, savings, and everything in between.
             </p>
@@ -84,7 +84,7 @@ const Onboarding = ({ onComplete }) => {
           <div className="animate-scale-in">
             <h1 className="text-xl font-bold text-brand-charcoal dark:text-white mb-2">Roughly, what do you earn monthly?</h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-              Just a ballpark — this helps Vex give you more useful insights later. Totally optional.
+              Just a ballpark — this helps Mopal give you more useful insights later. Totally optional.
             </p>
             <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Monthly income (₦)</label>
             <input

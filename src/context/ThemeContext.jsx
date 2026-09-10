@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 const ThemeContext = createContext(null);
-const STORAGE_KEY = 'vex_theme'; // 'light' | 'dark' | 'system'
+const STORAGE_KEY = 'mopal_theme'; // 'light' | 'dark' | 'system'
 
 const getSystemPref = () =>
   window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';

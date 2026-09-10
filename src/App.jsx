@@ -18,11 +18,11 @@ function App() {
   const toast = useToast();
   const [justOnboarded, setJustOnboarded] = useState(false);
   const [currentPath, setCurrentPath] = useState(() => {
-    return localStorage.getItem('vex_current_path') || 'dashboard';
+    return localStorage.getItem('mopal_current_path') || 'dashboard';
   });
 
   const navigate = (path) => {
-    localStorage.setItem('vex_current_path', path);
+    localStorage.setItem('mopal_current_path', path);
     setCurrentPath(path);
   };
   const [isGlobalAddOpen, setIsGlobalAddOpen] = useState(false);

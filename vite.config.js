@@ -24,8 +24,8 @@ export default defineConfig({
       },
       includeAssets: ['favicon.png'],
       manifest: {
-        name: 'Vex My Wallet',
-        short_name: 'Vex Wallet',
+        name: 'Mopal',
+        short_name: 'Mopal',
         description: 'Personal Spending Tracker',
         theme_color: '#FFE066',
         background_color: '#F4F5F7',
