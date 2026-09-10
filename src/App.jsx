@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
@@ -8,9 +8,12 @@ import Me from './pages/Me';
 import Auth from './pages/Auth';
 import TransactionModal from './components/TransactionModal';
 import { useAuth } from './context/AuthContext';
+import { runDueRecurringRules } from './utils/storage';
+import { useToast } from './context/ToastContext';
 
 function App() {
   const { session, loading } = useAuth();
+  const toast = useToast();
   const [currentPath, setCurrentPath] = useState(() => {
     return localStorage.getItem('vex_current_path') || 'dashboard';
   });
@@ -21,6 +24,17 @@ function App() {
   };
   const [isGlobalAddOpen, setIsGlobalAddOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+
+  // Generate any due recurring transactions once per session, right after login.
+  useEffect(() => {
+    if (!session) return;
+    runDueRecurringRules().then(({ generated }) => {
+      if (generated > 0) {
+        toast.success(`${generated} recurring transaction${generated !== 1 ? 's' : ''} added`);
+        setRefreshKey(k => k + 1);
+      }
+    }).catch(() => {});
+  }, [session?.user?.id]);
 
   const renderContent = () => {
     switch (currentPath) {

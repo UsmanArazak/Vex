@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
-import { exportData, importData, clearAllData } from '../utils/storage';
+import React, { useState, useRef, useEffect } from 'react';
+import { exportData, importData, clearAllData, getRecurringRules, deleteRecurringRule, saveRecurringRule, getCategories } from '../utils/storage';
 import CategoriesListModal from '../components/CategoriesListModal';
+import RecurringModal from '../components/RecurringModal';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { useConfirm } from '../context/ConfirmContext';
@@ -12,13 +13,42 @@ const THEME_OPTIONS = [
   { value: 'system', label: 'System' },
 ];
 
+const FREQ_LABEL = { daily: 'Daily', weekly: 'Weekly', monthly: 'Monthly' };
+
 const Settings = () => {
   const [isCategoriesModalOpen, setIsCategoriesModalOpen] = useState(false);
+  const [isRecurringModalOpen, setIsRecurringModalOpen] = useState(false);
+  const [editingRule, setEditingRule] = useState(null);
+  const [recurringRules, setRecurringRules] = useState([]);
+  const [categories, setCategories] = useState([]);
   const fileInputRef = useRef(null);
   const { user, signOut } = useAuth();
   const toast = useToast();
   const confirm = useConfirm();
   const { theme, setTheme } = useTheme();
+
+  const loadRecurring = async () => {
+    const [rules, cats] = await Promise.all([getRecurringRules(), getCategories()]);
+    setRecurringRules(rules);
+    setCategories(cats);
+  };
+
+  useEffect(() => { loadRecurring(); }, []);
+
+  const getCategoryName = (id) => categories.find(c => c.id === id)?.name || 'Uncategorized';
+
+  const handleDeleteRule = async (id) => {
+    const ok = await confirm({ title: 'Delete recurring transaction?', confirmLabel: 'Delete', danger: true });
+    if (!ok) return;
+    await deleteRecurringRule(id);
+    toast.success('Recurring transaction deleted');
+    loadRecurring();
+  };
+
+  const toggleRuleActive = async (rule) => {
+    await saveRecurringRule({ ...rule, isActive: !rule.isActive });
+    loadRecurring();
+  };
 
   // Export Data
   const handleExport = async () => {
@@ -107,6 +137,52 @@ const Settings = () => {
         </div>
       </section>
 
+      {/* Recurring Transactions */}
+      <section>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="font-bold text-xl">Recurring</h2>
+          <button
+            onClick={() => { setEditingRule(null); setIsRecurringModalOpen(true); }}
+            className="text-xs font-bold text-brand-goldDark dark:text-brand-gold flex items-center gap-1"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            Add
+          </button>
+        </div>
+        {recurringRules.length === 0 ? (
+          <div className="card border border-dashed border-gray-200 dark:border-brand-darkBorder shadow-none p-5 text-center">
+            <p className="text-sm text-gray-400 dark:text-gray-500">No recurring transactions yet — rent, salary, subscriptions, etc.</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {recurringRules.map(rule => (
+              <div key={rule.id} className="card p-4 border border-gray-100 dark:border-brand-darkBorder shadow-sm flex items-center justify-between gap-3">
+                <button className="flex-1 text-left min-w-0" onClick={() => { setEditingRule(rule); setIsRecurringModalOpen(true); }}>
+                  <p className="font-bold text-brand-charcoal dark:text-white text-sm truncate">
+                    {rule.note || getCategoryName(rule.categoryId)}
+                  </p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">
+                    {FREQ_LABEL[rule.frequency]} · ₦{Number(rule.amount).toLocaleString()} · {rule.type === 'expense' ? 'Expense' : 'Income'}
+                  </p>
+                </button>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => toggleRuleActive(rule)}
+                    className={`w-9 h-5 rounded-full relative transition-colors ${rule.isActive ? 'bg-brand-gold' : 'bg-gray-200 dark:bg-brand-darkBorder'}`}
+                    title={rule.isActive ? 'Active' : 'Paused'}
+                  >
+                    <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${rule.isActive ? 'translate-x-4' : 'translate-x-0.5'}`} />
+                  </button>
+                  <button onClick={() => handleDeleteRule(rule.id)} className="text-gray-300 hover:text-danger transition-colors">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
       {/* Categories */}
       <section>
         <h2 className="font-bold text-xl mb-4">Categories</h2>
@@ -168,6 +244,12 @@ const Settings = () => {
       <CategoriesListModal
         isOpen={isCategoriesModalOpen}
         onClose={() => setIsCategoriesModalOpen(false)}
+      />
+      <RecurringModal
+        isOpen={isRecurringModalOpen}
+        onClose={() => setIsRecurringModalOpen(false)}
+        initialData={editingRule}
+        onSaved={loadRecurring}
       />
     </div>
   );

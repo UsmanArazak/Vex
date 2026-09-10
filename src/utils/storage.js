@@ -193,6 +193,86 @@ export const deleteBudget = async (id) => {
   if (error) throw error;
 };
 
+// ---------- Recurring Transactions ----------
+export const getRecurringRules = async () => {
+  const { data, error } = await supabase
+    .from('recurring_rules')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data || []).map(r => ({
+    id: r.id,
+    categoryId: r.category_id,
+    type: r.type,
+    amount: r.amount,
+    note: r.note,
+    frequency: r.frequency,
+    nextRunDate: r.next_run_date,
+    isActive: r.is_active,
+  }));
+};
+
+export const saveRecurringRule = async (rule) => {
+  const user = await requireUser();
+  const row = {
+    ...(rule.id ? { id: rule.id } : {}),
+    user_id: user.id,
+    category_id: rule.categoryId,
+    type: rule.type,
+    amount: rule.amount,
+    note: rule.note,
+    frequency: rule.frequency,
+    next_run_date: rule.nextRunDate,
+    is_active: rule.isActive ?? true,
+  };
+  const { error } = await supabase.from('recurring_rules').upsert(row);
+  if (error) throw error;
+};
+
+export const deleteRecurringRule = async (id) => {
+  const { error } = await supabase.from('recurring_rules').delete().eq('id', id);
+  if (error) throw error;
+};
+
+const advanceDate = (dateStr, frequency) => {
+  const d = new Date(dateStr + 'T00:00:00');
+  if (frequency === 'daily') d.setDate(d.getDate() + 1);
+  else if (frequency === 'weekly') d.setDate(d.getDate() + 7);
+  else if (frequency === 'monthly') d.setMonth(d.getMonth() + 1);
+  return d.toISOString().split('T')[0];
+};
+
+// Checks all active recurring rules and generates any transactions that are
+// due (next_run_date <= today), advancing each rule forward. Safe to call on
+// every app load — a rule with next_run_date in the future is a no-op.
+// Caps at 24 catch-up runs per rule so a long-unopened app doesn't spiral.
+export const runDueRecurringRules = async () => {
+  const rules = await getRecurringRules();
+  const todayStr = new Date().toISOString().split('T')[0];
+  const dueRules = rules.filter(r => r.isActive && r.nextRunDate <= todayStr);
+  if (dueRules.length === 0) return { generated: 0 };
+
+  let generated = 0;
+  for (const rule of dueRules) {
+    let runDate = rule.nextRunDate;
+    let guard = 0;
+    while (runDate <= todayStr && guard < 24) {
+      await saveTransaction({
+        type: rule.type,
+        amount: rule.amount,
+        categoryId: rule.categoryId,
+        note: rule.note ? `${rule.note} (auto)` : 'Recurring transaction',
+        date: new Date(runDate + 'T09:00:00').toISOString(),
+      });
+      generated++;
+      runDate = advanceDate(runDate, rule.frequency);
+      guard++;
+    }
+    await saveRecurringRule({ ...rule, nextRunDate: runDate });
+  }
+  return { generated };
+};
+
 // ---------- Bulk operations ----------
 export const clearAllData = async () => {
   const user = await requireUser();
