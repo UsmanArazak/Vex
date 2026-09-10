@@ -82,13 +82,13 @@ const Debts = () => {
         <button
           onClick={() => setActiveTab('owed_to_me')}
           className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 ${
-            activeTab === 'owed_to_me' ? 'bg-white shadow-sm text-brand-charcoal' : 'text-gray-400'
+            activeTab === 'owed_to_me' ? 'bg-white dark:bg-brand-darkCard shadow-sm text-brand-charcoal dark:text-white' : 'text-gray-400 dark:text-gray-500'
           }`}
         >Owed</button>
         <button
           onClick={() => setActiveTab('i_owe')}
           className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 ${
-            activeTab === 'i_owe' ? 'bg-white shadow-sm text-brand-charcoal' : 'text-gray-400'
+            activeTab === 'i_owe' ? 'bg-white dark:bg-brand-darkCard shadow-sm text-brand-charcoal dark:text-white' : 'text-gray-400 dark:text-gray-500'
           }`}
         >I Owe</button>
       </div>

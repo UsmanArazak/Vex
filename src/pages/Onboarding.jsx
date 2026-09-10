@@ -38,7 +38,7 @@ const Onboarding = ({ onComplete }) => {
         await supabase.auth.updateUser({ data: { monthly_income_estimate: Number(income) } });
       }
       await markOnboarded();
-      toast.success('You\'re all set — welcome to Mopal!');
+      toast.success('You\'re all set!');
       onComplete();
     } catch (err) {
       toast.error(err.message || 'Something went wrong, but you can adjust this later in Settings');
@@ -69,9 +69,9 @@ const Onboarding = ({ onComplete }) => {
             <div className="w-14 h-14 rounded-2xl bg-brand-gold flex items-center justify-center mb-5">
               <span className="text-2xl font-black text-brand-charcoal">M</span>
             </div>
-            <h1 className="text-2xl font-bold text-brand-charcoal dark:text-white mb-2">Welcome to Mopal</h1>
+            <h1 className="text-2xl font-bold text-brand-charcoal dark:text-white mb-2">Let's personalize it</h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">
-              Let's set up your money in under a minute — spending, savings, and everything in between.
+              Two quick things and you're set up — takes under a minute.
             </p>
             <button onClick={next} className="btn-primary w-full">Let's go</button>
             <button onClick={skip} className="w-full text-center text-sm text-gray-400 dark:text-gray-500 mt-4 hover:text-brand-charcoal dark:hover:text-white transition-colors">

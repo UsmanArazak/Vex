@@ -6,6 +6,7 @@ import Goals from './pages/Goals';
 import Debts from './pages/Debts';
 import Me from './pages/Me';
 import Auth from './pages/Auth';
+import IntroCarousel from './pages/IntroCarousel';
 import ResetPassword from './pages/ResetPassword';
 import Onboarding from './pages/Onboarding';
 import TransactionModal from './components/TransactionModal';
@@ -17,6 +18,7 @@ function App() {
   const { session, loading, isPasswordRecovery } = useAuth();
   const toast = useToast();
   const [justOnboarded, setJustOnboarded] = useState(false);
+  const [hasSeenIntro, setHasSeenIntro] = useState(() => localStorage.getItem('mopal_seen_intro') === 'true');
   const [currentPath, setCurrentPath] = useState(() => {
     return localStorage.getItem('mopal_current_path') || 'dashboard';
   });
@@ -71,6 +73,16 @@ function App() {
   }
 
   if (!session) {
+    if (!hasSeenIntro) {
+      return (
+        <IntroCarousel
+          onDone={() => {
+            localStorage.setItem('mopal_seen_intro', 'true');
+            setHasSeenIntro(true);
+          }}
+        />
+      );
+    }
     return <Auth />;
   }
 

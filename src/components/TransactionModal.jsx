@@ -77,14 +77,14 @@ const TransactionModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
           <div className="flex bg-gray-100 dark:bg-brand-darkBorder p-1 rounded-xl">
             <button
               type="button"
-              className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-colors ${type === 'expense' ? 'bg-white shadow-sm text-brand-charcoal' : 'text-gray-500'}`}
+              className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-colors ${type === 'expense' ? 'bg-white dark:bg-brand-darkCard shadow-sm text-brand-charcoal dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}
               onClick={() => { setType('expense'); setCategoryId(categories.find(c => c.type === 'expense')?.id || ''); }}
             >
               Expense
             </button>
             <button
               type="button"
-              className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-colors ${type === 'income' ? 'bg-white shadow-sm text-brand-charcoal' : 'text-gray-500'}`}
+              className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-colors ${type === 'income' ? 'bg-white dark:bg-brand-darkCard shadow-sm text-brand-charcoal dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}
               onClick={() => { setType('income'); setCategoryId(categories.find(c => c.type === 'income')?.id || ''); }}
             >
               Income
@@ -112,7 +112,7 @@ const TransactionModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
                   key={cat.id}
                   onClick={() => setCategoryId(cat.id)}
                   className={`p-2 rounded-xl text-xs font-semibold flex flex-col items-center gap-1 transition-all ${
-                    categoryId === cat.id ? 'bg-white shadow-md scale-105 border border-brand-charcoal/10' : 'opacity-70 hover:opacity-100'
+                    categoryId === cat.id ? 'bg-white dark:bg-brand-darkCard shadow-md scale-105 border border-brand-charcoal/10 dark:border-white/10' : 'opacity-70 hover:opacity-100'
                   }`}
                   style={{ 
                     backgroundColor: categoryId === cat.id ? '#fff' : `${cat.color}20`, 

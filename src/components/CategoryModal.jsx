@@ -70,14 +70,14 @@ const CategoryModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
           <div className="flex bg-gray-100 dark:bg-brand-darkBorder p-1 rounded-xl">
             <button
               type="button"
-              className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-colors ${type === 'expense' ? 'bg-white shadow-sm text-brand-charcoal' : 'text-gray-500'}`}
+              className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-colors ${type === 'expense' ? 'bg-white dark:bg-brand-darkCard shadow-sm text-brand-charcoal dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}
               onClick={() => setType('expense')}
             >
               Expense
             </button>
             <button
               type="button"
-              className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-colors ${type === 'income' ? 'bg-white shadow-sm text-brand-charcoal' : 'text-gray-500'}`}
+              className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-colors ${type === 'income' ? 'bg-white dark:bg-brand-darkCard shadow-sm text-brand-charcoal dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}
               onClick={() => setType('income')}
             >
               Income

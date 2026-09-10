@@ -14,7 +14,7 @@ const applyTheme = (resolved) => {
 };
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(() => localStorage.getItem(STORAGE_KEY) || 'system');
+  const [theme, setTheme] = useState(() => localStorage.getItem(STORAGE_KEY) || 'light');
   const [resolved, setResolved] = useState(() => (theme === 'system' ? getSystemPref() : theme));
 
   useEffect(() => {

@@ -39,14 +39,14 @@ const Layout = ({ children, currentPath, onNavigate, onOpenAdd }) => {
                 key={item.id}
                 onClick={() => onNavigate(item.id)}
                 className={`flex flex-col items-center p-2 rounded-xl transition-all duration-300 ${
-                  isActive ? 'text-brand-charcoal' : 'text-gray-400 hover:text-gray-600'
+                  isActive ? 'text-brand-charcoal dark:text-white' : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'
                 }`}
               >
                 <div className={`relative ${isActive ? 'bg-brand-gold/20' : ''} p-2 rounded-full mb-1 transition-colors duration-300`}>
                   <Icon 
                     size={24} 
                     strokeWidth={isActive ? 2.5 : 2} 
-                    className={isActive ? 'text-brand-charcoal' : ''} 
+                    className={isActive ? 'text-brand-charcoal dark:text-white' : ''} 
                   />
                   {isActive && (
                     <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-brand-gold rounded-full border-2 border-white"></span>

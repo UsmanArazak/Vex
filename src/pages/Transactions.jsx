@@ -78,7 +78,7 @@ const Transactions = () => {
             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
               filterType === type 
                 ? 'bg-brand-gold text-brand-charcoal shadow-sm' 
-                : 'bg-white text-gray-500 border border-gray-100 hover:bg-gray-50'
+                : 'bg-white dark:bg-brand-darkCard text-gray-500 dark:text-gray-400 border border-gray-100 dark:border-brand-darkBorder hover:bg-gray-50 dark:hover:bg-brand-darkBorder'
             }`}
           >
             {type.charAt(0).toUpperCase() + type.slice(1)}
