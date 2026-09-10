@@ -1,23 +1,29 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { getTransactions, getCategories, deleteTransaction } from '../utils/storage';
 import { format, parseISO } from 'date-fns';
 import TransactionModal from '../components/TransactionModal';
 
 const Transactions = () => {
-  const [transactions, setTransactions] = useState(getTransactions());
-  const categories = getCategories();
-  
+  const [transactions, setTransactions] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [filterType, setFilterType] = useState('all'); // all, income, expense
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTx, setEditingTx] = useState(null);
 
-  const refreshData = () => {
-    setTransactions(getTransactions());
+  const refreshData = async () => {
+    const [txs, cats] = await Promise.all([getTransactions(), getCategories()]);
+    setTransactions(txs);
+    setCategories(cats);
+    setLoading(false);
   };
 
-  const handleDelete = (id) => {
+  useEffect(() => { refreshData(); }, []);
+
+  const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this transaction?")) {
-      deleteTransaction(id);
+      await deleteTransaction(id);
       refreshData();
     }
   };

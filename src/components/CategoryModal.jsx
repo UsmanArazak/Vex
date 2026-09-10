@@ -23,23 +23,32 @@ const CategoryModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
     }
   }, [isOpen, initialData]);
 
-  const handleSubmit = (e) => {
+  const [saving, setSaving] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name) return;
+    if (!name || saving) return;
 
-    let categories = getCategories();
-    
-    if (initialData) {
-      // Edit
-      categories = categories.map(c => c.id === initialData.id ? { ...c, name, type, color } : c);
-    } else {
-      // Create
-      categories.push({ id: crypto.randomUUID(), name, type, color });
+    setSaving(true);
+    try {
+      let categories = await getCategories();
+
+      if (initialData) {
+        // Edit
+        categories = categories.map(c => c.id === initialData.id ? { ...c, name, type, color } : c);
+      } else {
+        // Create
+        categories.push({ id: crypto.randomUUID(), name, type, color });
+      }
+
+      await saveCategories(categories);
+      onSaved();
+      onClose();
+    } catch (err) {
+      alert(err.message || 'Failed to save category');
+    } finally {
+      setSaving(false);
     }
-
-    saveCategories(categories);
-    onSaved();
-    onClose();
   };
 
   if (!isOpen) return null;
@@ -99,8 +108,8 @@ const CategoryModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
             </div>
           </div>
 
-          <button type="submit" className="btn-primary w-full mt-4">
-            Save Category
+          <button type="submit" disabled={saving} className="btn-primary w-full mt-4 disabled:opacity-50">
+            {saving ? 'Saving…' : 'Save Category'}
           </button>
         </form>
       </div>

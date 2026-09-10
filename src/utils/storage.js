@@ -1,142 +1,185 @@
 // src/utils/storage.js
+// Supabase-backed data layer. Function names match the old localStorage
+// version, but everything here is now async and scoped to the signed-in
+// user via Row Level Security.
 
-const STORAGE_KEYS = {
-  TRANSACTIONS: 'vex_wallet_transactions',
-  CATEGORIES: 'vex_wallet_categories',
-  GOALS: 'vex_wallet_goals',
-  DEBTS: 'vex_wallet_debts',
+import { supabase } from '../lib/supabase';
+
+const requireUser = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not signed in');
+  return user;
 };
 
-const DEFAULT_CATEGORIES = [
-  { id: 'cat-1', name: 'Food', color: '#FF6B6B', type: 'expense' },
-  { id: 'cat-2', name: 'Transport', color: '#4ECDC4', type: 'expense' },
-  { id: 'cat-3', name: 'Rent', color: '#45B7D1', type: 'expense' },
-  { id: 'cat-4', name: 'Data/Airtime', color: '#96CEB4', type: 'expense' },
-  { id: 'cat-5', name: 'Salary', color: '#FFE066', type: 'income' },
-  { id: 'cat-6', name: 'Business Income', color: '#4CAF50', type: 'income' },
-  { id: 'cat-7', name: 'Savings', color: '#9C27B0', type: 'expense' }, // Savings is treated as expense from main balance
-];
-
-// Helper to get data
-const getData = (key, defaultData) => {
-  try {
-    const item = localStorage.getItem(key);
-    return item ? JSON.parse(item) : defaultData;
-  } catch (error) {
-    console.error(`Error reading ${key} from localStorage`, error);
-    return defaultData;
-  }
+// ---------- Categories ----------
+export const getCategories = async () => {
+  const { data, error } = await supabase
+    .from('categories')
+    .select('*')
+    .order('created_at', { ascending: true });
+  if (error) throw error;
+  return (data || []).map(c => ({ id: c.id, name: c.name, color: c.color, type: c.type }));
 };
 
-// Helper to set data
-const setData = (key, data) => {
-  try {
-    localStorage.setItem(key, JSON.stringify(data));
-  } catch (error) {
-    console.error(`Error saving ${key} to localStorage`, error);
-  }
+export const saveCategories = async (categories) => {
+  const user = await requireUser();
+  // Upsert each category; new ones (no valid uuid) get inserted, existing get updated.
+  const rows = categories.map(c => ({
+    ...(c.id ? { id: c.id } : {}),
+    user_id: user.id,
+    name: c.name,
+    color: c.color,
+    type: c.type,
+  }));
+  const { data, error } = await supabase.from('categories').upsert(rows).select();
+  if (error) throw error;
+  return data;
 };
 
-// Initialize categories if empty
-export const getCategories = () => {
-  const cats = getData(STORAGE_KEYS.CATEGORIES, null);
-  if (!cats) {
-    setData(STORAGE_KEYS.CATEGORIES, DEFAULT_CATEGORIES);
-    return DEFAULT_CATEGORIES;
-  }
-  return cats;
+export const deleteCategory = async (id) => {
+  const { error } = await supabase.from('categories').delete().eq('id', id);
+  if (error) throw error;
 };
 
-export const saveCategories = (categories) => {
-  setData(STORAGE_KEYS.CATEGORIES, categories);
+// ---------- Transactions ----------
+export const getTransactions = async () => {
+  const { data, error } = await supabase
+    .from('transactions')
+    .select('*')
+    .order('date', { ascending: false });
+  if (error) throw error;
+  return (data || []).map(t => ({
+    id: t.id,
+    type: t.type,
+    amount: t.amount,
+    categoryId: t.category_id,
+    note: t.note,
+    date: t.date,
+  }));
 };
 
-// Transactions
-export const getTransactions = () => getData(STORAGE_KEYS.TRANSACTIONS, []);
-
-export const saveTransaction = (transaction) => {
-  const transactions = getTransactions();
-  // if editing existing, replace it
-  const index = transactions.findIndex(t => t.id === transaction.id);
-  if (index >= 0) {
-    transactions[index] = transaction;
-  } else {
-    // new transaction
-    transactions.push({ ...transaction, id: crypto.randomUUID() });
-  }
-  setData(STORAGE_KEYS.TRANSACTIONS, transactions);
-  return transactions;
-};
-
-export const deleteTransaction = (id) => {
-  const transactions = getTransactions().filter(t => t.id !== id);
-  setData(STORAGE_KEYS.TRANSACTIONS, transactions);
-  return transactions;
-};
-
-// Goals
-export const getGoals = () => getData(STORAGE_KEYS.GOALS, []);
-
-export const saveGoal = (goal) => {
-  const goals = getGoals();
-  const index = goals.findIndex(g => g.id === goal.id);
-  if (index >= 0) {
-    goals[index] = goal;
-  } else {
-    goals.push({ ...goal, id: crypto.randomUUID() });
-  }
-  setData(STORAGE_KEYS.GOALS, goals);
-  return goals;
-};
-
-export const deleteGoal = (id) => {
-  const goals = getGoals().filter(g => g.id !== id);
-  setData(STORAGE_KEYS.GOALS, goals);
-  return goals;
-};
-
-// Debts
-export const getDebts = () => getData(STORAGE_KEYS.DEBTS, []);
-
-export const saveDebt = (debt) => {
-  const debts = getDebts();
-  const index = debts.findIndex(d => d.id === debt.id);
-  if (index >= 0) {
-    debts[index] = debt;
-  } else {
-    debts.push({ ...debt, id: crypto.randomUUID() });
-  }
-  setData(STORAGE_KEYS.DEBTS, debts);
-  return debts;
-};
-
-export const deleteDebt = (id) => {
-  const debts = getDebts().filter(d => d.id !== id);
-  setData(STORAGE_KEYS.DEBTS, debts);
-  return debts;
-};
-
-// Update clearAllData to also remove debts
-export const clearAllData = () => {
-  localStorage.removeItem(STORAGE_KEYS.TRANSACTIONS);
-  localStorage.removeItem(STORAGE_KEYS.CATEGORIES);
-  localStorage.removeItem(STORAGE_KEYS.GOALS);
-  localStorage.removeItem(STORAGE_KEYS.DEBTS);
-};
-
-// Extend exportData and importData
-export const exportData = () => {
-  return {
-    transactions: getTransactions(),
-    categories: getCategories(),
-    goals: getGoals(),
-    debts: getDebts(),
+export const saveTransaction = async (transaction) => {
+  const user = await requireUser();
+  const row = {
+    ...(transaction.id ? { id: transaction.id } : {}),
+    user_id: user.id,
+    type: transaction.type,
+    amount: transaction.amount,
+    category_id: transaction.categoryId,
+    note: transaction.note,
+    date: transaction.date,
   };
+  const { error } = await supabase.from('transactions').upsert(row);
+  if (error) throw error;
+  return getTransactions();
 };
 
-export const importData = (data) => {
-  if (data.transactions) setData(STORAGE_KEYS.TRANSACTIONS, data.transactions);
-  if (data.categories) setData(STORAGE_KEYS.CATEGORIES, data.categories);
-  if (data.goals) setData(STORAGE_KEYS.GOALS, data.goals);
-  if (data.debts) setData(STORAGE_KEYS.DEBTS, data.debts);
+export const deleteTransaction = async (id) => {
+  const { error } = await supabase.from('transactions').delete().eq('id', id);
+  if (error) throw error;
+  return getTransactions();
+};
+
+// ---------- Goals ----------
+export const getGoals = async () => {
+  const { data, error } = await supabase
+    .from('goals')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data || []).map(g => ({
+    id: g.id,
+    name: g.name,
+    cost: g.cost,
+    targetMonth: g.target_month,
+    color: g.color,
+    isCompleted: g.is_completed,
+    createdAt: g.created_at,
+  }));
+};
+
+export const saveGoal = async (goal) => {
+  const user = await requireUser();
+  const row = {
+    ...(goal.id ? { id: goal.id } : {}),
+    user_id: user.id,
+    name: goal.name,
+    cost: goal.cost || null,
+    target_month: goal.targetMonth || null,
+    color: goal.color,
+    is_completed: goal.isCompleted ?? false,
+  };
+  const { error } = await supabase.from('goals').upsert(row);
+  if (error) throw error;
+  return getGoals();
+};
+
+export const deleteGoal = async (id) => {
+  const { error } = await supabase.from('goals').delete().eq('id', id);
+  if (error) throw error;
+  return getGoals();
+};
+
+// ---------- Debts ----------
+export const getDebts = async () => {
+  const { data, error } = await supabase
+    .from('debts')
+    .select('*')
+    .order('date', { ascending: false });
+  if (error) throw error;
+  return (data || []).map(d => ({
+    id: d.id,
+    name: d.name,
+    amount: d.amount,
+    date: d.date,
+    type: d.type,
+  }));
+};
+
+export const saveDebt = async (debt) => {
+  const user = await requireUser();
+  const row = {
+    ...(debt.id ? { id: debt.id } : {}),
+    user_id: user.id,
+    name: debt.name,
+    amount: debt.amount,
+    date: debt.date,
+    type: debt.type,
+  };
+  const { error } = await supabase.from('debts').upsert(row);
+  if (error) throw error;
+  return getDebts();
+};
+
+export const deleteDebt = async (id) => {
+  const { error } = await supabase.from('debts').delete().eq('id', id);
+  if (error) throw error;
+  return getDebts();
+};
+
+// ---------- Bulk operations ----------
+export const clearAllData = async () => {
+  const user = await requireUser();
+  await Promise.all([
+    supabase.from('transactions').delete().eq('user_id', user.id),
+    supabase.from('goals').delete().eq('user_id', user.id),
+    supabase.from('debts').delete().eq('user_id', user.id),
+  ]);
+};
+
+export const exportData = async () => {
+  const [transactions, categories, goals, debts] = await Promise.all([
+    getTransactions(),
+    getCategories(),
+    getGoals(),
+    getDebts(),
+  ]);
+  return { transactions, categories, goals, debts };
+};
+
+export const importData = async (data) => {
+  if (data.categories) await saveCategories(data.categories);
+  if (data.transactions) await Promise.all(data.transactions.map(t => saveTransaction(t)));
+  if (data.goals) await Promise.all(data.goals.map(g => saveGoal(g)));
+  if (data.debts) await Promise.all(data.debts.map(d => saveDebt(d)));
 };

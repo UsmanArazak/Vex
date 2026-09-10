@@ -27,9 +27,11 @@ const GoalModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
     }
   }, [isOpen, initialData]);
 
-  const handleSubmit = (e) => {
+  const [saving, setSaving] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name) return;
+    if (!name || saving) return;
 
     const goal = {
       id: initialData?.id,
@@ -41,9 +43,16 @@ const GoalModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
       createdAt: initialData?.createdAt || new Date().toISOString()
     };
 
-    saveGoal(goal);
-    onSaved();
-    onClose();
+    setSaving(true);
+    try {
+      await saveGoal(goal);
+      onSaved();
+      onClose();
+    } catch (err) {
+      alert(err.message || 'Failed to save item');
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -108,8 +117,8 @@ const GoalModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
             </div>
           </div>
 
-          <button type="submit" className="btn-primary w-full mt-4">
-            Save Item
+          <button type="submit" disabled={saving} className="btn-primary w-full mt-4 disabled:opacity-50">
+            {saving ? 'Saving…' : 'Save Item'}
           </button>
         </form>
       </div>

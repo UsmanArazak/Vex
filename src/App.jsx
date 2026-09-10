@@ -5,9 +5,12 @@ import Transactions from './pages/Transactions';
 import Goals from './pages/Goals';
 import Debts from './pages/Debts';
 import Me from './pages/Me';
+import Auth from './pages/Auth';
 import TransactionModal from './components/TransactionModal';
+import { useAuth } from './context/AuthContext';
 
 function App() {
+  const { session, loading } = useAuth();
   const [currentPath, setCurrentPath] = useState(() => {
     return localStorage.getItem('vex_current_path') || 'dashboard';
   });
@@ -35,6 +38,18 @@ function App() {
         return null;
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-brand-gray">
+        <p className="text-gray-400 font-medium">Loading…</p>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return <Auth />;
+  }
 
   return (
     <>

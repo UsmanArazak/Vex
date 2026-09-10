@@ -3,32 +3,36 @@ import { createPortal } from 'react-dom';
 import { getCategories, saveTransaction } from '../utils/storage';
 
 const TransactionModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
-  const categories = getCategories();
-  
+  const [categories, setCategories] = useState([]);
+
   const [type, setType] = useState('expense');
   const [amount, setAmount] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [note, setNote] = useState('');
-  
+  const [saving, setSaving] = useState(false);
+
   useEffect(() => {
     if (isOpen) {
-      if (initialData) {
-        setType(initialData.type);
-        setAmount(initialData.amount);
-        setCategoryId(initialData.categoryId);
-        setNote(initialData.note || '');
-      } else {
-        setType('expense');
-        setAmount('');
-        setCategoryId(categories.find(c => c.type === 'expense')?.id || '');
-        setNote('');
-      }
+      getCategories().then(cats => {
+        setCategories(cats);
+        if (initialData) {
+          setType(initialData.type);
+          setAmount(initialData.amount);
+          setCategoryId(initialData.categoryId);
+          setNote(initialData.note || '');
+        } else {
+          setType('expense');
+          setAmount('');
+          setCategoryId(cats.find(c => c.type === 'expense')?.id || '');
+          setNote('');
+        }
+      });
     }
   }, [isOpen, initialData]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!amount || !categoryId) return;
+    if (!amount || !categoryId || saving) return;
 
     const transaction = {
       id: initialData?.id, // will be undefined for new
@@ -39,9 +43,16 @@ const TransactionModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
       date: initialData?.date || new Date().toISOString()
     };
 
-    saveTransaction(transaction);
-    onSaved();
-    onClose();
+    setSaving(true);
+    try {
+      await saveTransaction(transaction);
+      onSaved();
+      onClose();
+    } catch (err) {
+      alert(err.message || 'Failed to save transaction');
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -126,8 +137,8 @@ const TransactionModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
             />
           </div>
 
-          <button type="submit" className="btn-primary w-full mt-4">
-            Save {type === 'expense' ? 'Expense' : 'Income'}
+          <button type="submit" disabled={saving} className="btn-primary w-full mt-4 disabled:opacity-50">
+            {saving ? 'Saving…' : `Save ${type === 'expense' ? 'Expense' : 'Income'}`}
           </button>
         </form>
       </div>

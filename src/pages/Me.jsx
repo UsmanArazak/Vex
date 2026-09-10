@@ -1,13 +1,21 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { getTransactions, getCategories } from '../utils/storage';
 import { format, parseISO, isSameMonth, subMonths } from 'date-fns';
 import SettingsModal from '../components/SettingsModal';
 
 const Me = () => {
-  const transactions = getTransactions();
-  const categories = getCategories();
+  const [transactions, setTransactions] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [showSpending, setShowSpending] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      const [txs, cats] = await Promise.all([getTransactions(), getCategories()]);
+      setTransactions(txs);
+      setCategories(cats);
+    })();
+  }, []);
 
   const now = new Date();
   const currentMonthName = format(now, 'MMMM yyyy');

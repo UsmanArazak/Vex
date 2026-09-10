@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { getDebts, saveDebt, deleteDebt } from '../utils/storage';
 import DebtModal from '../components/DebtModal';
 import { format, parseISO } from 'date-fns';
@@ -6,12 +6,14 @@ import { format, parseISO } from 'date-fns';
 const formatCurrency = (val) => `₦${Number(val).toLocaleString()}`;
 
 const Debts = () => {
-  const [debts, setDebts] = useState(getDebts());
+  const [debts, setDebts] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeDebt, setActiveDebt] = useState(null);
   const [activeTab, setActiveTab] = useState('owed_to_me');
 
-  const refresh = () => setDebts(getDebts());
+  const refresh = async () => setDebts(await getDebts());
+
+  useEffect(() => { refresh(); }, []);
 
   const owedToMe = useMemo(() => debts.filter(d => d.type === 'owed_to_me').sort((a, b) => new Date(b.date) - new Date(a.date)), [debts]);
   const iOwe = useMemo(() => debts.filter(d => d.type === 'i_owe').sort((a, b) => new Date(b.date) - new Date(a.date)), [debts]);
@@ -20,7 +22,7 @@ const Debts = () => {
   const totalIOwe = iOwe.reduce((a, d) => a + Number(d.amount), 0);
 
   const openEdit = (debt) => { setActiveDebt(debt); setIsModalOpen(true); };
-  const handleDelete = (id) => { if (confirm('Delete this debt entry?')) { deleteDebt(id); refresh(); } };
+  const handleDelete = async (id) => { if (confirm('Delete this debt entry?')) { await deleteDebt(id); refresh(); } };
 
   const activeList = activeTab === 'owed_to_me' ? owedToMe : iOwe;
 
@@ -129,7 +131,7 @@ const Debts = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         initialData={activeDebt}
-        onSaved={(debt) => { saveDebt(debt); refresh(); setIsModalOpen(false); }}
+        onSaved={async (debt) => { await saveDebt(debt); refresh(); setIsModalOpen(false); }}
       />
     </div>
   );

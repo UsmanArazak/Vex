@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { getCategories, saveCategories } from '../utils/storage';
+import { getCategories, deleteCategory } from '../utils/storage';
 import CategoryModal from './CategoryModal';
 
 const CategoriesListModal = ({ isOpen, onClose }) => {
@@ -11,12 +11,12 @@ const CategoriesListModal = ({ isOpen, onClose }) => {
   // Refresh categories every time this modal opens
   useEffect(() => {
     if (isOpen) {
-      setCategories(getCategories());
+      refreshCategories();
     }
   }, [isOpen]);
 
-  const refreshCategories = () => {
-    setCategories(getCategories());
+  const refreshCategories = async () => {
+    setCategories(await getCategories());
   };
 
   const handleEdit = (cat) => {
@@ -24,10 +24,9 @@ const CategoriesListModal = ({ isOpen, onClose }) => {
     setIsEditModalOpen(true);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this category? Transactions using this category won't be deleted, but they might show as 'Other'.")) {
-      const newCats = categories.filter(c => c.id !== id);
-      saveCategories(newCats);
+      await deleteCategory(id);
       refreshCategories();
     }
   };

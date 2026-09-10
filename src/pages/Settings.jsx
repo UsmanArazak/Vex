@@ -1,14 +1,16 @@
 import React, { useState, useRef } from 'react';
 import { exportData, importData, clearAllData } from '../utils/storage';
 import CategoriesListModal from '../components/CategoriesListModal';
+import { useAuth } from '../context/AuthContext';
 
 const Settings = () => {
   const [isCategoriesModalOpen, setIsCategoriesModalOpen] = useState(false);
   const fileInputRef = useRef(null);
+  const { user, signOut } = useAuth();
 
   // Export Data
-  const handleExport = () => {
-    const data = exportData();
+  const handleExport = async () => {
+    const data = await exportData();
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
     const downloadAnchorNode = document.createElement('a');
     downloadAnchorNode.setAttribute("href", dataStr);
@@ -24,10 +26,10 @@ const Settings = () => {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       try {
         const jsonData = JSON.parse(event.target.result);
-        importData(jsonData);
+        await importData(jsonData);
         alert('Data imported successfully! The app will now reload.');
         window.location.reload();
       } catch (err) {
@@ -40,10 +42,10 @@ const Settings = () => {
   };
 
   // Clear Data
-  const handleClearData = () => {
+  const handleClearData = async () => {
     if (window.confirm("WARNING! Are you absolutely sure you want to delete ALL your transactions, goals, and custom categories? This action CANNOT be undone.")) {
       if (window.confirm("Final confirmation: Are you sure?")) {
-        clearAllData();
+        await clearAllData();
         alert('All data has been cleared. The app will now reload.');
         window.location.reload();
       }
@@ -53,6 +55,20 @@ const Settings = () => {
   return (
     <div className="p-6 pt-12 pb-24 space-y-8">
       <h1 className="text-3xl font-bold text-brand-charcoal mb-8">Settings</h1>
+
+      {/* Account */}
+      <section>
+        <h2 className="font-bold text-xl mb-4">Account</h2>
+        <div className="card border border-gray-100 shadow-sm p-5">
+          <p className="text-sm text-gray-500 mb-4 truncate">Signed in as <span className="font-semibold text-brand-charcoal">{user?.email}</span></p>
+          <button
+            onClick={signOut}
+            className="w-full flex items-center justify-center gap-2 bg-gray-100 text-brand-charcoal font-semibold py-3 rounded-xl hover:bg-gray-200 transition-colors"
+          >
+            Sign Out
+          </button>
+        </div>
+      </section>
 
       {/* Categories */}
       <section>

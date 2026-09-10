@@ -1,22 +1,24 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { getGoals, deleteGoal, saveGoal } from '../utils/storage';
 import GoalModal from '../components/GoalModal';
 import { format, parse } from 'date-fns';
 
 const Goals = () => {
-  const [goals, setGoals] = useState(getGoals());
+  const [goals, setGoals] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeGoal, setActiveGoal] = useState(null);
 
   const formatCurrency = (val) => `₦${Number(val).toLocaleString()}`;
 
-  const refreshData = () => {
-    setGoals(getGoals());
+  const refreshData = async () => {
+    setGoals(await getGoals());
   };
 
-  const handleDelete = (id) => {
+  useEffect(() => { refreshData(); }, []);
+
+  const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this item?")) {
-      deleteGoal(id);
+      await deleteGoal(id);
       refreshData();
     }
   };
@@ -26,8 +28,8 @@ const Goals = () => {
     setIsModalOpen(true);
   };
 
-  const toggleComplete = (goal) => {
-    saveGoal({ ...goal, isCompleted: !goal.isCompleted });
+  const toggleComplete = async (goal) => {
+    await saveGoal({ ...goal, isCompleted: !goal.isCompleted });
     refreshData();
   };
 

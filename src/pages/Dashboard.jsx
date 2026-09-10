@@ -1,13 +1,19 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, AreaChart, Area, XAxis, Tooltip, YAxis } from 'recharts';
 import { getTransactions, getCategories } from '../utils/storage';
 import { format, subMonths, isSameMonth, isToday, parseISO } from 'date-fns';
 
 const Dashboard = ({ onNavigate }) => {
-  const rawTransactions = getTransactions();
-  const categories = getCategories();
-  
-  const transactions = rawTransactions;
+  const [transactions, setTransactions] = useState([]);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      const [txs, cats] = await Promise.all([getTransactions(), getCategories()]);
+      setTransactions(txs);
+      setCategories(cats);
+    })();
+  }, []);
 
   // Calculations
   const { totalBalance, todayExpense, currentMonthExpense } = useMemo(() => {
