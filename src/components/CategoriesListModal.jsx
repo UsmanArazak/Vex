@@ -50,8 +50,11 @@ const CategoriesListModal = ({ isOpen, onClose }) => {
 
   return createPortal(
     <>
-      <div className="fixed inset-0 z-50 flex flex-col justify-end bg-brand-charcoal/40 backdrop-blur-sm animate-in fade-in duration-200">
-        <div className="bg-white dark:bg-brand-darkCard rounded-t-3xl p-6 w-full max-w-md mx-auto shadow-2xl h-[80vh] flex flex-col animate-in slide-in-from-bottom-full duration-300">
+      <div className="fixed inset-0 z-[140] flex items-end sm:items-center justify-center bg-brand-charcoal/50 backdrop-blur-sm animate-toast-in" onClick={onClose}>
+        <div
+          className="bg-white dark:bg-brand-darkCard rounded-t-3xl sm:rounded-3xl p-6 w-full sm:max-w-md shadow-2xl h-[80vh] sm:h-auto sm:max-h-[80vh] flex flex-col animate-scale-in"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="flex justify-between items-center mb-6 shrink-0">
             <h2 className="text-xl font-bold">Manage Categories</h2>
             <button onClick={onClose} className="p-2 bg-gray-100 dark:bg-brand-darkBorder rounded-full text-gray-500 dark:text-gray-400 hover:text-brand-charcoal">

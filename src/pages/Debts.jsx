@@ -145,7 +145,7 @@ const Debts = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         initialData={activeDebt}
-        onSaved={async (debt) => { await saveDebt(debt); toast.success(debt.id ? 'Debt updated' : 'Debt added'); refresh(); setIsModalOpen(false); }}
+        onSaved={async (debt) => { await saveDebt(debt); refresh(); }}
       />
     </div>
   );
