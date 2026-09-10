@@ -68,8 +68,14 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-brand-gray dark:bg-brand-dark p-6">
-      <div className="w-full max-w-sm bg-white dark:bg-brand-darkCard rounded-3xl shadow-soft p-8">
+    <div className="min-h-screen flex items-center justify-center bg-brand-gray dark:bg-brand-dark p-6 relative overflow-hidden">
+      {/* Simple background decoration */}
+      <div className="absolute -top-24 -left-24 w-72 h-72 bg-brand-gold/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-32 -right-20 w-80 h-80 bg-brand-gold/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/3 right-10 w-24 h-24 border-2 border-brand-gold/20 rounded-3xl rotate-12 hidden md:block pointer-events-none" />
+      <div className="absolute bottom-1/4 left-10 w-14 h-14 border-2 border-brand-charcoal/10 dark:border-white/10 rounded-full hidden md:block pointer-events-none" />
+
+      <div className="w-full max-w-sm bg-white dark:bg-brand-darkCard rounded-3xl shadow-soft p-8 relative z-10">
         <h1 className="text-3xl font-bold text-brand-charcoal dark:text-white mb-1">Mopal</h1>
         <p className="text-gray-400 dark:text-gray-500 mb-6 text-sm">
           {mode === 'login' ? 'Welcome back' : mode === 'signup' ? 'Create your account' : 'Reset your password'}
