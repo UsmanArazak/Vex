@@ -76,7 +76,7 @@ const Dashboard = ({ onNavigate }) => {
         </div>
         <button
           onClick={() => onNavigate('me')}
-          className="w-11 h-11 rounded-full bg-brand-gold flex items-center justify-center shadow-md active:scale-95 transition-transform"
+          className="md:hidden w-11 h-11 rounded-full bg-brand-gold flex items-center justify-center shadow-md active:scale-95 transition-transform"
         >
           <span className="font-black text-brand-charcoal dark:text-white text-sm">Me</span>
         </button>

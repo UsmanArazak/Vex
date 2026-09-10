@@ -1,13 +1,17 @@
 import React from 'react';
-import { Home, List, Target, Settings, Plus, Banknote } from 'lucide-react';
+import { Home, List, Target, Settings, Plus, Banknote, User } from 'lucide-react';
 
 const Layout = ({ children, currentPath, onNavigate, onOpenAdd }) => {
+  // Mobile bottom nav stays exactly as-is — "Me" is intentionally not here.
   const navItems = [
     { id: 'dashboard', icon: Home, label: 'Home' },
     { id: 'transactions', icon: List, label: 'Activity' },
     { id: 'goals', icon: Target, label: 'Goals' },
     { id: 'debts', icon: Banknote, label: 'Debts' },
   ];
+
+  // Desktop sidebar gets "Me" too, since there's no separate avatar button there.
+  const desktopNavItems = [...navItems, { id: 'me', icon: User, label: 'Me' }];
 
   return (
     <div className="min-h-screen bg-brand-gray dark:bg-brand-dark">
@@ -23,7 +27,7 @@ const Layout = ({ children, currentPath, onNavigate, onOpenAdd }) => {
           </div>
 
           <nav className="flex flex-col gap-1 flex-1">
-            {navItems.map((item) => {
+            {desktopNavItems.map((item) => {
               const Icon = item.icon;
               const isActive = currentPath === item.id;
               return (
