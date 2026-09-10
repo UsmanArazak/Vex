@@ -60,6 +60,11 @@ export const AuthProvider = ({ children }) => {
     if (error) throw error;
   };
 
+  const markIntroSeen = async () => {
+    const { error } = await supabase.auth.updateUser({ data: { intro_seen: true } });
+    if (error) throw error;
+  };
+
   const value = {
     session,
     user: session?.user ?? null,
@@ -71,6 +76,7 @@ export const AuthProvider = ({ children }) => {
     sendPasswordReset,
     updatePassword,
     markOnboarded,
+    markIntroSeen,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

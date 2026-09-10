@@ -15,10 +15,10 @@ import { runDueRecurringRules } from './utils/storage';
 import { useToast } from './context/ToastContext';
 
 function App() {
-  const { session, loading, isPasswordRecovery } = useAuth();
+  const { session, loading, isPasswordRecovery, markIntroSeen } = useAuth();
   const toast = useToast();
   const [justOnboarded, setJustOnboarded] = useState(false);
-  const [hasSeenIntro, setHasSeenIntro] = useState(() => localStorage.getItem('mopal_seen_intro') === 'true');
+  const [hasSeenIntro, setHasSeenIntro] = useState(false);
   const [currentPath, setCurrentPath] = useState(() => {
     return localStorage.getItem('mopal_current_path') || 'dashboard';
   });
@@ -73,17 +73,19 @@ function App() {
   }
 
   if (!session) {
-    if (!hasSeenIntro) {
-      return (
-        <IntroCarousel
-          onDone={() => {
-            localStorage.setItem('mopal_seen_intro', 'true');
-            setHasSeenIntro(true);
-          }}
-        />
-      );
-    }
     return <Auth />;
+  }
+
+  // Post-login setup: first the feature intro, then personalization.
+  if (!session.user.user_metadata?.intro_seen && !hasSeenIntro) {
+    return (
+      <IntroCarousel
+        onDone={async () => {
+          try { await markIntroSeen(); } catch {}
+          setHasSeenIntro(true);
+        }}
+      />
+    );
   }
 
   // First-time users get a short setup flow before landing in the app.
