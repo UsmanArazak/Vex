@@ -8,6 +8,7 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -15,8 +16,11 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
+      if (event === 'PASSWORD_RECOVERY') {
+        setIsPasswordRecovery(true);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -38,13 +42,35 @@ export const AuthProvider = ({ children }) => {
     if (error) throw error;
   };
 
+  const sendPasswordReset = async (email) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin,
+    });
+    if (error) throw error;
+  };
+
+  const updatePassword = async (newPassword) => {
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) throw error;
+    setIsPasswordRecovery(false);
+  };
+
+  const markOnboarded = async () => {
+    const { error } = await supabase.auth.updateUser({ data: { onboarded: true } });
+    if (error) throw error;
+  };
+
   const value = {
     session,
     user: session?.user ?? null,
     loading,
+    isPasswordRecovery,
     signUp,
     signIn,
     signOut,
+    sendPasswordReset,
+    updatePassword,
+    markOnboarded,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

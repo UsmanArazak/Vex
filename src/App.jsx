@@ -6,14 +6,17 @@ import Goals from './pages/Goals';
 import Debts from './pages/Debts';
 import Me from './pages/Me';
 import Auth from './pages/Auth';
+import ResetPassword from './pages/ResetPassword';
+import Onboarding from './pages/Onboarding';
 import TransactionModal from './components/TransactionModal';
 import { useAuth } from './context/AuthContext';
 import { runDueRecurringRules } from './utils/storage';
 import { useToast } from './context/ToastContext';
 
 function App() {
-  const { session, loading } = useAuth();
+  const { session, loading, isPasswordRecovery } = useAuth();
   const toast = useToast();
+  const [justOnboarded, setJustOnboarded] = useState(false);
   const [currentPath, setCurrentPath] = useState(() => {
     return localStorage.getItem('vex_current_path') || 'dashboard';
   });
@@ -55,14 +58,25 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-brand-gray">
+      <div className="min-h-screen flex items-center justify-center bg-brand-gray dark:bg-brand-dark">
         <p className="text-gray-400 font-medium">Loading…</p>
       </div>
     );
   }
 
+  // A password-recovery link takes priority over everything else, even if
+  // the recovery session technically counts as "logged in".
+  if (isPasswordRecovery) {
+    return <ResetPassword />;
+  }
+
   if (!session) {
     return <Auth />;
+  }
+
+  // First-time users get a short setup flow before landing in the app.
+  if (!session.user.user_metadata?.onboarded && !justOnboarded) {
+    return <Onboarding onComplete={() => setJustOnboarded(true)} />;
   }
 
   return (
