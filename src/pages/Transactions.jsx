@@ -4,6 +4,7 @@ import { format, parseISO } from 'date-fns';
 import TransactionModal from '../components/TransactionModal';
 import { useConfirm } from '../context/ConfirmContext';
 import { useToast } from '../context/ToastContext';
+import { SkeletonList } from '../components/ui/Skeleton';
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
@@ -87,7 +88,9 @@ const Transactions = () => {
 
       {/* List */}
       <div className="space-y-6 pb-12">
-        {Object.keys(groupedTransactions).length > 0 ? (
+        {loading ? (
+          <SkeletonList count={5} />
+        ) : Object.keys(groupedTransactions).length > 0 ? (
           Object.keys(groupedTransactions).map(dateStr => (
             <div key={dateStr}>
               <h3 className="text-xs font-bold text-gray-400 dark:text-gray-500 mb-3 uppercase tracking-wider">

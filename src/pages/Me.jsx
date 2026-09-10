@@ -2,18 +2,21 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { getTransactions, getCategories } from '../utils/storage';
 import { format, parseISO, isSameMonth, subMonths } from 'date-fns';
 import SettingsModal from '../components/SettingsModal';
+import { SkeletonLine, SkeletonList } from '../components/ui/Skeleton';
 
 const Me = () => {
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [showSpending, setShowSpending] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       const [txs, cats] = await Promise.all([getTransactions(), getCategories()]);
       setTransactions(txs);
       setCategories(cats);
+      setLoading(false);
     })();
   }, []);
 
@@ -110,11 +113,11 @@ const Me = () => {
             <div className="grid grid-cols-2 gap-4 pt-2">
               <div>
                 <p className="text-xs text-gray-400 dark:text-gray-500 font-medium mb-0.5">Total Spent</p>
-                <p className="text-2xl font-black text-red-400">{formatCurrency(monthExpense)}</p>
+                {loading ? <div className="skeleton w-20 h-7 bg-white/10" /> : <p className="text-2xl font-black text-red-400">{formatCurrency(monthExpense)}</p>}
               </div>
               <div className="border-l border-gray-700/80 pl-4">
                 <p className="text-xs text-gray-400 dark:text-gray-500 font-medium mb-0.5">Total Earned</p>
-                <p className="text-2xl font-black text-emerald-400">{formatCurrency(monthIncome)}</p>
+                {loading ? <div className="skeleton w-20 h-7 bg-white/10" /> : <p className="text-2xl font-black text-emerald-400">{formatCurrency(monthIncome)}</p>}
               </div>
             </div>
           </div>
@@ -156,7 +159,9 @@ const Me = () => {
           {/* Category Breakdown */}
           <section>
             <h2 className="font-bold text-lg mb-3">Where did it go?</h2>
-            {byCategory.length > 0 ? (
+            {loading ? (
+              <SkeletonList count={3} />
+            ) : byCategory.length > 0 ? (
               <div className="space-y-3">
                 {byCategory.map(({ cat, total, count }) => {
                   const pct = monthExpense > 0 ? Math.round((total / monthExpense) * 100) : 0;

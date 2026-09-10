@@ -4,6 +4,7 @@ import DebtModal from '../components/DebtModal';
 import { format, parseISO } from 'date-fns';
 import { useConfirm } from '../context/ConfirmContext';
 import { useToast } from '../context/ToastContext';
+import { SkeletonList } from '../components/ui/Skeleton';
 
 const formatCurrency = (val) => `₦${Number(val).toLocaleString()}`;
 
@@ -12,10 +13,11 @@ const Debts = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeDebt, setActiveDebt] = useState(null);
   const [activeTab, setActiveTab] = useState('owed_to_me');
+  const [loading, setLoading] = useState(true);
   const confirm = useConfirm();
   const toast = useToast();
 
-  const refresh = async () => setDebts(await getDebts());
+  const refresh = async () => { setDebts(await getDebts()); setLoading(false); };
 
   useEffect(() => { refresh(); }, []);
 
@@ -92,7 +94,9 @@ const Debts = () => {
       </div>
 
       {/* Debt List */}
-      {activeList.length > 0 ? (
+      {loading ? (
+        <SkeletonList count={4} />
+      ) : activeList.length > 0 ? (
         <div className="space-y-3">
           {activeList.map((d, i) => {
             const initials = d.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();

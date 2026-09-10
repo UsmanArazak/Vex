@@ -4,11 +4,13 @@ import GoalModal from '../components/GoalModal';
 import { format, parse } from 'date-fns';
 import { useConfirm } from '../context/ConfirmContext';
 import { useToast } from '../context/ToastContext';
+import { SkeletonList } from '../components/ui/Skeleton';
 
 const Goals = () => {
   const [goals, setGoals] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeGoal, setActiveGoal] = useState(null);
+  const [loading, setLoading] = useState(true);
   const confirm = useConfirm();
   const toast = useToast();
 
@@ -16,6 +18,7 @@ const Goals = () => {
 
   const refreshData = async () => {
     setGoals(await getGoals());
+    setLoading(false);
   };
 
   useEffect(() => { refreshData(); }, []);
@@ -95,7 +98,9 @@ const Goals = () => {
 
       {/* Active Goals Section */}
       <div className="space-y-6">
-        {Object.keys(groupedActiveGoals).length > 0 ? (
+        {loading ? (
+          <SkeletonList count={4} />
+        ) : Object.keys(groupedActiveGoals).length > 0 ? (
           Object.keys(groupedActiveGoals).map(monthStr => (
             <div key={monthStr}>
               <h3 className="font-bold text-lg text-brand-gold mb-3 border-b-2 border-brand-gold pb-1 inline-block">

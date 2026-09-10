@@ -2,16 +2,19 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, AreaChart, Area, XAxis, Tooltip, YAxis } from 'recharts';
 import { getTransactions, getCategories } from '../utils/storage';
 import { format, subMonths, isSameMonth, isToday, parseISO } from 'date-fns';
+import { SkeletonLine, SkeletonList } from '../components/ui/Skeleton';
 
 const Dashboard = ({ onNavigate }) => {
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       const [txs, cats] = await Promise.all([getTransactions(), getCategories()]);
       setTransactions(txs);
       setCategories(cats);
+      setLoading(false);
     })();
   }, []);
 
@@ -73,7 +76,11 @@ const Dashboard = ({ onNavigate }) => {
             Today's Spendings
           </h2>
           <div className="mt-4">
-            <p className="text-4xl font-bold">{formatCurrency(todayExpense)}</p>
+            {loading ? (
+              <div className="skeleton w-32 h-9 bg-white/40" />
+            ) : (
+              <p className="text-4xl font-bold">{formatCurrency(todayExpense)}</p>
+            )}
           </div>
         </div>
         <div className="absolute -right-8 -top-8 w-32 h-32 bg-white/20 rounded-full blur-2xl"></div>
@@ -86,7 +93,9 @@ const Dashboard = ({ onNavigate }) => {
           <h3 className="font-bold text-lg">Today's Activity</h3>
         </div>
         <div className="space-y-3">
-          {todaysActivity.length > 0 ? (
+          {loading ? (
+            <SkeletonList count={3} />
+          ) : todaysActivity.length > 0 ? (
             todaysActivity.map(t => {
               const cat = getCategory(t.categoryId);
               return (
