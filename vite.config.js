@@ -7,6 +7,21 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      injectRegister: false, // we register manually in main.jsx for reliable auto-reload
+      workbox: {
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
+        // Don't let the app shell (HTML/JS/CSS) get served stale — only
+        // cache actual static assets, always fetch fresh code from network.
+        navigateFallbackDenylist: [/^\/api/],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
+            handler: 'NetworkOnly',
+          },
+        ],
+      },
       includeAssets: ['favicon.png'],
       manifest: {
         name: 'Vex My Wallet',
