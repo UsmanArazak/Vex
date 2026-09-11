@@ -6,6 +6,7 @@ import Goals from './pages/Goals';
 import Debts from './pages/Debts';
 import Me from './pages/Me';
 import Auth from './pages/Auth';
+import LandingPage from './pages/LandingPage';
 import IntroCarousel from './pages/IntroCarousel';
 import ResetPassword from './pages/ResetPassword';
 import Onboarding from './pages/Onboarding';
@@ -19,6 +20,7 @@ function App() {
   const toast = useToast();
   const [justOnboarded, setJustOnboarded] = useState(false);
   const [hasSeenIntro, setHasSeenIntro] = useState(false);
+  const [authScreen, setAuthScreen] = useState(null); // null (landing) | 'login' | 'signup'
   const [currentPath, setCurrentPath] = useState(() => {
     return localStorage.getItem('mopal_current_path') || 'dashboard';
   });
@@ -73,7 +75,15 @@ function App() {
   }
 
   if (!session) {
-    return <Auth />;
+    if (!authScreen) {
+      return (
+        <LandingPage
+          onGetStarted={() => setAuthScreen('signup')}
+          onLogin={() => setAuthScreen('login')}
+        />
+      );
+    }
+    return <Auth initialMode={authScreen} />;
   }
 
   // Post-login setup: first the feature intro, then personalization.

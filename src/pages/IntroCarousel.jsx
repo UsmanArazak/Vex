@@ -10,7 +10,7 @@ const MockCard = ({ children, className = '' }) => (
   </div>
 );
 
-const WelcomeMock = () => (
+export const WelcomeMock = () => (
   <MockCard className="w-full">
     <div className="bg-brand-gold rounded-xl p-4 mb-3">
       <p className="text-[10px] font-bold text-brand-charcoal/70 uppercase tracking-wider mb-1">Today's Spendings</p>
@@ -30,7 +30,7 @@ const WelcomeMock = () => (
   </MockCard>
 );
 
-const TransactionsMock = () => (
+export const TransactionsMock = () => (
   <MockCard className="w-full space-y-2.5">
     {[['#FF6B6B', 'F', 'Food', '-₦2,000'], ['#45B7D1', 'R', 'Rent', '-₦85,000'], ['#FFE066', 'S', 'Salary', '+₦250,000']].map(([c, i, n, a]) => (
       <div key={n} className="flex items-center justify-between">
@@ -44,7 +44,7 @@ const TransactionsMock = () => (
   </MockCard>
 );
 
-const BudgetsMock = () => (
+export const BudgetsMock = () => (
   <MockCard className="w-full space-y-4">
     <div>
       <div className="flex justify-between text-xs font-bold mb-1.5">
@@ -67,7 +67,7 @@ const BudgetsMock = () => (
   </MockCard>
 );
 
-const DebtsMock = () => (
+export const DebtsMock = () => (
   <div className="w-full grid grid-cols-2 gap-2.5">
     <MockCard className="!bg-amber-50 dark:!bg-amber-950/30">
       <p className="text-[10px] font-bold text-amber-600 uppercase tracking-wider mb-1">Owed to you</p>
@@ -80,7 +80,7 @@ const DebtsMock = () => (
   </div>
 );
 
-const GoalsMock = () => (
+export const GoalsMock = () => (
   <MockCard className="w-full">
     <div className="flex items-center gap-3 mb-3">
       <div className="w-5 h-5 rounded-md border-2 border-brand-gold shrink-0" />
