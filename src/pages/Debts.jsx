@@ -43,6 +43,21 @@ const Debts = () => {
     try { return format(parseISO(dateStr), 'MMM d, yyyy'); } catch { return dateStr; }
   };
 
+  const getDueBadge = (dueDate) => {
+    if (!dueDate) return null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const due = parseISO(dueDate);
+    const diffDays = Math.round((due - today) / 86400000);
+    if (diffDays < 0) {
+      return <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-red-100 text-red-600 dark:bg-red-950/40 dark:text-red-400">Overdue</span>;
+    }
+    if (diffDays <= 3) {
+      return <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400">Due soon</span>;
+    }
+    return <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500">Due {formatDate(dueDate)}</span>;
+  };
+
   return (
     <div className="p-6 pt-12 pb-24">
       {/* Header */}
@@ -117,7 +132,10 @@ const Debts = () => {
                 {/* Info */}
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-brand-charcoal dark:text-white truncate">{d.name}</p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{formatDate(d.date)}</p>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <p className="text-xs text-gray-400 dark:text-gray-500">{formatDate(d.date)}</p>
+                    {getDueBadge(d.dueDate)}
+                  </div>
                 </div>
                 {/* Amount + Actions */}
                 <div className="flex items-center gap-2 shrink-0">

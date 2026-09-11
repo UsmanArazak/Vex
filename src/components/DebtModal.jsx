@@ -7,6 +7,7 @@ const DebtModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
   const [name, setName] = useState('');
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState('');
+  const [dueDate, setDueDate] = useState('');
   const [type, setType] = useState('owed_to_me'); // or 'i_owe'
   const [saving, setSaving] = useState(false);
   const toast = useToast();
@@ -17,11 +18,13 @@ const DebtModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
         setName(initialData.name);
         setAmount(initialData.amount);
         setDate(initialData.date);
+        setDueDate(initialData.dueDate || '');
         setType(initialData.type);
       } else {
         setName('');
         setAmount('');
         setDate(format(new Date(), 'yyyy-MM-dd'));
+        setDueDate('');
         setType('owed_to_me');
       }
     }
@@ -39,6 +42,7 @@ const DebtModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
         name,
         amount: Number(amount),
         date,
+        dueDate: dueDate || null,
         type,
       });
       toast.success(initialData ? 'Debt updated' : 'Debt added');
@@ -115,6 +119,17 @@ const DebtModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
               onChange={e => setDate(e.target.value)}
               className="w-full mt-1 p-3 rounded-xl border border-gray-200 dark:border-brand-darkBorder dark:bg-brand-dark dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-gold"
             />
+          </div>
+
+          <div>
+            <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Due date (optional)</label>
+            <input
+              type="date"
+              value={dueDate}
+              onChange={e => setDueDate(e.target.value)}
+              className="w-full mt-1 p-3 rounded-xl border border-gray-200 dark:border-brand-darkBorder dark:bg-brand-dark dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-gold"
+            />
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">We'll remind you when this is due or overdue.</p>
           </div>
 
           <button type="submit" disabled={saving} className="btn-primary w-full mt-2 disabled:opacity-50">

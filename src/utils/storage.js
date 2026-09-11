@@ -179,6 +179,7 @@ export const getDebts = async () => {
       amount: d.amount,
       date: d.date,
       type: d.type,
+      dueDate: d.due_date,
     }));
   });
 };
@@ -192,6 +193,7 @@ export const saveDebt = async (debt) => {
     amount: debt.amount,
     date: debt.date,
     type: debt.type,
+    due_date: debt.dueDate || null,
   };
   const { error } = await supabase.from('debts').upsert(row);
   if (error) throw error;

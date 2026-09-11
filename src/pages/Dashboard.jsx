@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, AreaChart, Area, XAxis, Tooltip, YAxis } from 'recharts';
-import { getTransactions, getCategories, getBudgets } from '../utils/storage';
+import { getTransactions, getCategories, getBudgets, getDebts } from '../utils/storage';
 import { format, subMonths, isSameMonth, isToday, parseISO } from 'date-fns';
 import { SkeletonLine, SkeletonList } from '../components/ui/Skeleton';
 import { useToast } from '../context/ToastContext';
@@ -15,7 +15,7 @@ const Dashboard = ({ onNavigate, onOpenAdd }) => {
   useEffect(() => {
     (async () => {
       const currentMonthKey = format(new Date(), 'yyyy-MM');
-      const [txs, cats, budgets] = await Promise.all([getTransactions(), getCategories(), getBudgets(currentMonthKey)]);
+      const [txs, cats, budgets, debts] = await Promise.all([getTransactions(), getCategories(), getBudgets(currentMonthKey), getDebts()]);
       setTransactions(txs);
       setCategories(cats);
       setLoading(false);
@@ -31,6 +31,14 @@ const Dashboard = ({ onNavigate, onOpenAdd }) => {
           const names = overspent.map(b => cats.find(c => c.id === b.categoryId)?.name).filter(Boolean);
           toast.info(`Over budget this month: ${names.join(', ')}`, 5000);
         }
+      }
+
+      // Gentle one-time reminder for overdue debts
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const overdueDebts = debts.filter(d => d.dueDate && parseISO(d.dueDate) < today);
+      if (overdueDebts.length > 0) {
+        toast.info(`${overdueDebts.length} overdue debt${overdueDebts.length !== 1 ? 's' : ''} — check your Debts page`, 5000);
       }
     })();
   }, []);
