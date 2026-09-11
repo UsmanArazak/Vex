@@ -403,7 +403,7 @@ const SettingsScreen = ({ onBack }) => {
         title="Settings"
         onBack={onBack}
         infoKey="settings"
-        infoText="This page lets you change how the app looks, manage your categories, set up repeating payments, back up your data, or sign out."
+        infoText="This page lets you change our look, manage your categories, set up repeating payments, back up your data, or sign out."
       />
 
       {/* Appearance */}

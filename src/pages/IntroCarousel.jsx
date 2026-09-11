@@ -99,9 +99,9 @@ const GoalsMock = () => (
 const SLIDES = [
   { title: 'Welcome to Mopal', body: "Mopal is a money app. It helps you record your income and your spending, in one place.", mock: <WelcomeMock /> },
   { title: 'Record every transaction', body: 'You can record what you earn and what you spend. Each entry has a category. You can also set up payments that repeat, such as rent or salary.', mock: <TransactionsMock /> },
-  { title: 'Budgets that help you', body: "Set a monthly limit for each category. The app will warn you before you spend too much.", mock: <BudgetsMock /> },
+  { title: 'Budgets that help you', body: "Set a monthly limit for each category. We will warn you before you spend too much.", mock: <BudgetsMock /> },
   { title: 'Debts made simple', body: "Keep a record of money people owe you, and money you owe other people.", mock: <DebtsMock /> },
-  { title: "Reach your goals", body: "Save money for what matters to you, such as a laptop or your rent. The app shows your progress as you save.", mock: <GoalsMock /> },
+  { title: "Reach your goals", body: "Save money for what matters to you, such as a laptop or your rent. We show your progress as you save.", mock: <GoalsMock /> },
 ];
 
 const IntroCarousel = ({ onDone }) => {

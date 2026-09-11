@@ -121,7 +121,7 @@ const Onboarding = ({ onComplete }) => {
           <div className="animate-scale-in">
             <h1 className="text-xl font-bold text-brand-charcoal dark:text-white mb-2">How much do you earn each month?</h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-              This is only an estimate. It helps the app show you how much of your income you are spending. You do not have to answer.
+              This is only an estimate. It helps us show you how much of your income you are spending. You do not have to answer.
             </p>
             <div className="space-y-2">
               {INCOME_RANGES.map((range) => (
