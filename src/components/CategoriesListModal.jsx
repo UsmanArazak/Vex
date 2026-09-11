@@ -85,10 +85,10 @@ const CategoriesListModal = ({ isOpen, onClose }) => {
                   </div>
                 </div>
                 <div className="flex gap-1">
-                  <button onClick={() => handleEdit(cat)} className="text-sm text-gray-400 dark:text-gray-500 hover:text-brand-charcoal p-2 rounded-lg bg-gray-50 dark:bg-brand-darkCard hover:bg-gray-100">
+                  <button onClick={() => handleEdit(cat)} className="text-sm text-gray-500 dark:text-gray-300 hover:text-brand-charcoal dark:hover:text-white p-2 rounded-lg bg-gray-50 dark:bg-brand-darkBorder hover:bg-gray-100 dark:hover:bg-opacity-70">
                     Edit
                   </button>
-                  <button onClick={() => handleDelete(cat.id)} className="text-sm text-red-400 hover:text-red-600 p-2 rounded-lg bg-red-50 hover:bg-red-100">
+                  <button onClick={() => handleDelete(cat.id)} className="text-sm text-red-400 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 p-2 rounded-lg bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-950/50">
                     Del
                   </button>
                 </div>

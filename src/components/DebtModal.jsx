@@ -92,7 +92,7 @@ const DebtModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
               onChange={e => setName(e.target.value)}
               autoFocus
               className="w-full mt-1 p-3 rounded-xl border border-gray-200 dark:border-brand-darkBorder dark:bg-brand-dark dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-gold"
-              placeholder="e.g. Tunde"
+              placeholder="e.g. Muhammad"
             />
           </div>
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Home, List, Target, Settings, Plus, Banknote, User, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import InstallPrompt from './InstallPrompt';
 
 const Layout = ({ children, currentPath, onNavigate, onOpenAdd }) => {
   const { signOut } = useAuth();
@@ -69,6 +70,7 @@ const Layout = ({ children, currentPath, onNavigate, onOpenAdd }) => {
         <div className="flex-1 flex justify-center">
           <div className="w-full max-w-md md:max-w-4xl bg-brand-gray dark:bg-brand-dark h-screen md:h-auto md:min-h-screen relative shadow-2xl md:shadow-none flex flex-col overflow-hidden md:overflow-visible">
 
+            <InstallPrompt />
             <main className="flex-1 overflow-y-auto md:overflow-visible pb-24 md:pb-16 hide-scrollbar">
               {children}
             </main>

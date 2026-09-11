@@ -55,7 +55,7 @@ const ResetPassword = () => {
                     minLength={6}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full p-3 pr-11 rounded-xl border border-gray-200 dark:border-brand-darkBorder focus:outline-none focus:ring-2 focus:ring-brand-gold"
+                    className="w-full p-3 pr-11 rounded-xl border border-gray-200 dark:border-brand-darkBorder dark:bg-brand-dark dark:text-white dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold"
                     placeholder="••••••••"
                     autoFocus
                   />
@@ -83,7 +83,7 @@ const ResetPassword = () => {
                   minLength={6}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full mt-1 p-3 rounded-xl border border-gray-200 dark:border-brand-darkBorder focus:outline-none focus:ring-2 focus:ring-brand-gold"
+                  className="w-full mt-1 p-3 rounded-xl border border-gray-200 dark:border-brand-darkBorder dark:bg-brand-dark dark:text-white dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold"
                   placeholder="••••••••"
                 />
               </div>

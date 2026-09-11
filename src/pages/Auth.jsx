@@ -61,7 +61,12 @@ const Auth = () => {
         setInfo("If that email has an account, we've sent a password reset link.");
       }
     } catch (err) {
-      setError(err.message || 'Something went wrong');
+      const raw = err?.message || '';
+      if (/fetch|network|connection/i.test(raw)) {
+        setError('This is taking longer than expected. Please check your internet connection and try again.');
+      } else {
+        setError(raw || 'Something went wrong. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -91,7 +96,7 @@ const Auth = () => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full mt-1 p-3 rounded-xl border border-gray-200 dark:border-brand-darkBorder focus:outline-none focus:ring-2 focus:ring-brand-gold"
+              className="w-full mt-1 p-3 rounded-xl border border-gray-200 dark:border-brand-darkBorder dark:bg-brand-dark dark:text-white dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold"
               placeholder="you@example.com"
             />
           </div>
@@ -106,7 +111,7 @@ const Auth = () => {
                   minLength={6}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full p-3 pr-11 rounded-xl border border-gray-200 dark:border-brand-darkBorder focus:outline-none focus:ring-2 focus:ring-brand-gold"
+                  className="w-full p-3 pr-11 rounded-xl border border-gray-200 dark:border-brand-darkBorder dark:bg-brand-dark dark:text-white dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold"
                   placeholder="••••••••"
                 />
                 <button
@@ -140,7 +145,7 @@ const Auth = () => {
                   minLength={6}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full p-3 pr-11 rounded-xl border border-gray-200 dark:border-brand-darkBorder focus:outline-none focus:ring-2 focus:ring-brand-gold"
+                  className="w-full p-3 pr-11 rounded-xl border border-gray-200 dark:border-brand-darkBorder dark:bg-brand-dark dark:text-white dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-gold"
                   placeholder="••••••••"
                 />
                 <button

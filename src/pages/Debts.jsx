@@ -84,7 +84,7 @@ const Debts = () => {
             <p className="text-xs font-bold uppercase text-amber-600/70 tracking-wider">Owed</p>
           </div>
           <p className="text-2xl font-black text-amber-700">{formatCurrency(totalOwedToMe)}</p>
-          <p className="text-xs text-amber-600/60 mt-1">Money others will pay you</p>
+          <p className="text-[10px] sm:text-xs text-amber-600/60 mt-1 leading-tight">Money others will pay you</p>
           <p className="text-xs text-amber-600/50 mt-0.5">{owedToMe.length} {owedToMe.length === 1 ? 'person' : 'people'}</p>
         </div>
         <div className="card p-5 border-0 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-sm">
@@ -95,7 +95,7 @@ const Debts = () => {
             <p className="text-xs font-bold uppercase text-emerald-600/70 tracking-wider">I Owe</p>
           </div>
           <p className="text-2xl font-black text-emerald-700">{formatCurrency(totalIOwe)}</p>
-          <p className="text-xs text-emerald-600/60 mt-1">Money you will pay others</p>
+          <p className="text-[10px] sm:text-xs text-emerald-600/60 mt-1 leading-tight">Money you will pay others</p>
           <p className="text-xs text-emerald-600/50 mt-0.5">{iOwe.length} {iOwe.length === 1 ? 'person' : 'people'}</p>
         </div>
       </div>
