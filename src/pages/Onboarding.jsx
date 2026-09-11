@@ -106,9 +106,9 @@ const Onboarding = ({ onComplete }) => {
             <div className="w-14 h-14 rounded-2xl bg-brand-gold flex items-center justify-center mb-5">
               <span className="text-2xl font-black text-brand-charcoal">M</span>
             </div>
-            <h1 className="text-2xl font-bold text-brand-charcoal dark:text-white mb-2">Let's personalize it</h1>
+            <h1 className="text-2xl font-bold text-brand-charcoal dark:text-white mb-2">Let us set up your account</h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">
-              A few quick things and you're set up — takes under a minute.
+              A few short questions. This will take less than one minute.
             </p>
             <button onClick={next} className="btn-primary w-full">Let's go</button>
             <button onClick={skip} className="w-full text-center text-sm text-gray-400 dark:text-gray-500 mt-4 hover:text-brand-charcoal dark:hover:text-white transition-colors">
@@ -119,9 +119,9 @@ const Onboarding = ({ onComplete }) => {
 
         {step === 'income' && (
           <div className="animate-scale-in">
-            <h1 className="text-xl font-bold text-brand-charcoal dark:text-white mb-2">Roughly, what do you earn monthly?</h1>
+            <h1 className="text-xl font-bold text-brand-charcoal dark:text-white mb-2">How much do you earn each month?</h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-              Just a ballpark — helps Mopal show you how much of your income you're spending. Totally optional.
+              This is only an estimate. It helps the app show you how much of your income you are spending. You do not have to answer.
             </p>
             <div className="space-y-2">
               {INCOME_RANGES.map((range) => (
@@ -147,9 +147,9 @@ const Onboarding = ({ onComplete }) => {
 
         {step === 'expense' && (
           <div className="animate-scale-in">
-            <h1 className="text-xl font-bold text-brand-charcoal dark:text-white mb-2">Spent anything today?</h1>
+            <h1 className="text-xl font-bold text-brand-charcoal dark:text-white mb-2">Did you spend money today?</h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-              Log it now so your dashboard isn't empty the moment you walk in.
+              You can record it now. This helps your Home page show real information as soon as you start.
             </p>
 
             <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Amount (₦)</label>
@@ -202,7 +202,7 @@ const Onboarding = ({ onComplete }) => {
           <div className="animate-scale-in">
             <h1 className="text-xl font-bold text-brand-charcoal dark:text-white mb-2">Add your first goal</h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-              Something you're saving toward — a laptop, rent, travel. You can always add more later.
+              This is something you want to save for, such as a laptop or your rent. You can add more goals later.
             </p>
             <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Goal name</label>
             <input

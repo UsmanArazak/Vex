@@ -97,11 +97,11 @@ const GoalsMock = () => (
 );
 
 const SLIDES = [
-  { title: 'Welcome to Mopal', body: "The money app built for how you actually live — formal income, side hustles, cash, all in one place.", mock: <WelcomeMock /> },
-  { title: 'Track every transaction', body: 'Log income and expenses in seconds, organized by category — with recurring transactions for rent, salary, and subscriptions on autopilot.', mock: <TransactionsMock /> },
-  { title: 'Budgets that actually help', body: "Set a monthly limit per category and get a nudge before you overspend — not after.", mock: <BudgetsMock /> },
-  { title: 'Debts, simplified', body: "Keep track of who owes you and who you owe — money between friends and family, without the awkwardness.", mock: <DebtsMock /> },
-  { title: "Goals you'll actually hit", body: "Save toward what matters — a laptop, rent, travel — and watch your progress build, one transaction at a time.", mock: <GoalsMock /> },
+  { title: 'Welcome to Mopal', body: "Mopal is a money app. It helps you record your income and your spending, in one place.", mock: <WelcomeMock /> },
+  { title: 'Record every transaction', body: 'You can record what you earn and what you spend. Each entry has a category. You can also set up payments that repeat, such as rent or salary.', mock: <TransactionsMock /> },
+  { title: 'Budgets that help you', body: "Set a monthly limit for each category. The app will warn you before you spend too much.", mock: <BudgetsMock /> },
+  { title: 'Debts made simple', body: "Keep a record of money people owe you, and money you owe other people.", mock: <DebtsMock /> },
+  { title: "Reach your goals", body: "Save money for what matters to you, such as a laptop or your rent. The app shows your progress as you save.", mock: <GoalsMock /> },
 ];
 
 const IntroCarousel = ({ onDone }) => {
