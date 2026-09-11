@@ -152,6 +152,62 @@ const SpendingScreen = ({ onBack }) => {
   const maxTrend = Math.max(...monthlyTrend.map(m => m.total), 1);
   const spentPct = incomeEstimate > 0 ? Math.round((monthExpense / incomeEstimate) * 100) : 0;
 
+  // Last month's per-category totals, for comparison
+  const lastMonthByCategory = useMemo(() => {
+    const lastMonth = subMonths(now, 1);
+    const map = {};
+    transactions.forEach(t => {
+      if (t.type !== 'expense') return;
+      if (!isSameMonth(parseISO(t.date), lastMonth)) return;
+      map[t.categoryId] = (map[t.categoryId] || 0) + Number(t.amount);
+    });
+    return map;
+  }, [transactions]);
+
+  // Simple, rule-based insights — computed entirely from this person's own
+  // data. No AI, no external calls: just comparisons on real numbers.
+  const insights = useMemo(() => {
+    const list = [];
+
+    // 1. Budget overage — highest priority
+    const overBudget = byCategory.filter(({ cat, total }) => {
+      const b = getBudgetForCategory(cat.id);
+      return b && total > b.limitAmount;
+    });
+    if (overBudget.length > 0) {
+      const names = overBudget.map(o => o.cat.name).join(', ');
+      list.push({ icon: '⚠️', text: `You are over budget on ${names} this month.` });
+    }
+
+    // 2. Income usage warning
+    if (incomeEstimate > 0 && spentPct >= 80) {
+      list.push({ icon: '💰', text: `You have spent ${spentPct}% of your income this month.` });
+    }
+
+    // 3. Biggest month-over-month category change
+    let biggestChange = null;
+    byCategory.forEach(({ cat, total }) => {
+      const last = lastMonthByCategory[cat.id] || 0;
+      if (last < 1000) return; // ignore tiny/noisy baselines
+      const pctChange = Math.round(((total - last) / last) * 100);
+      if (Math.abs(pctChange) >= 20 && (!biggestChange || Math.abs(pctChange) > Math.abs(biggestChange.pctChange))) {
+        biggestChange = { cat, pctChange };
+      }
+    });
+    if (biggestChange) {
+      const direction = biggestChange.pctChange > 0 ? 'up' : 'down';
+      list.push({ icon: biggestChange.pctChange > 0 ? '📈' : '📉', text: `${biggestChange.cat.name} spending is ${direction} ${Math.abs(biggestChange.pctChange)}% compared to last month.` });
+    }
+
+    // 4. Top spending category, if nothing more urgent already said
+    if (list.length < 2 && byCategory.length > 0) {
+      const top = byCategory[0];
+      list.push({ icon: '🏆', text: `Your biggest spend this month is ${top.cat.name}, at ${formatCurrency(top.total)}.` });
+    }
+
+    return list.slice(0, 3);
+  }, [byCategory, lastMonthByCategory, incomeEstimate, spentPct]);
+
   return (
     <div className="p-6 pt-12 pb-24 space-y-6">
       <BackHeader
@@ -195,6 +251,17 @@ const SpendingScreen = ({ onBack }) => {
           </div>
         )}
       </div>
+
+      {insights.length > 0 && (
+        <section className="space-y-2">
+          {insights.map((insight, i) => (
+            <div key={i} className="flex items-start gap-3 bg-white dark:bg-brand-darkCard border border-gray-100 dark:border-brand-darkBorder rounded-xl px-4 py-3">
+              <span className="text-lg shrink-0">{insight.icon}</span>
+              <p className="text-sm font-semibold text-brand-charcoal dark:text-white leading-snug">{insight.text}</p>
+            </div>
+          ))}
+        </section>
+      )}
 
       <section className="card p-5 border border-gray-100 dark:border-brand-darkBorder shadow-sm">
         <div className="mb-4">

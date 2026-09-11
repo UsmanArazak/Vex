@@ -63,6 +63,26 @@ const Dashboard = ({ onNavigate, onOpenAdd }) => {
       .sort((a, b) => new Date(b.date) - new Date(a.date));
   }, [transactions]);
 
+  // Logging streak — consecutive days with at least one transaction, ending
+  // today or yesterday (so the streak doesn't reset before the day is over).
+  const streak = useMemo(() => {
+    if (transactions.length === 0) return 0;
+    const daysWithEntries = new Set(
+      transactions.map(t => format(parseISO(t.date), 'yyyy-MM-dd'))
+    );
+    let count = 0;
+    let cursor = new Date();
+    // If nothing logged today yet, start checking from yesterday instead.
+    if (!daysWithEntries.has(format(cursor, 'yyyy-MM-dd'))) {
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    while (daysWithEntries.has(format(cursor, 'yyyy-MM-dd'))) {
+      count++;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    return count;
+  }, [transactions]);
+
   const formatCurrency = (val) => `₦${val.toLocaleString()}`;
 
   const getCategory = (id) => categories.find(c => c.id === id) || { name: 'Other', color: '#ccc' };
@@ -92,6 +112,15 @@ const Dashboard = ({ onNavigate, onOpenAdd }) => {
           Add Transaction
         </button>
       </header>
+
+      {streak >= 2 && (
+        <div className="flex items-center gap-2 bg-orange-50 dark:bg-orange-950/30 border border-orange-100 dark:border-orange-900/40 rounded-xl px-4 py-2.5 -mt-1">
+          <span className="text-lg">🔥</span>
+          <p className="text-sm font-bold text-orange-700 dark:text-orange-400">
+            {streak}-day logging streak — keep it going!
+          </p>
+        </div>
+      )}
 
       {/* Today's Focus Card */}
       <section className="card bg-brand-gold relative overflow-hidden shadow-[0_10px_30px_-10px_rgba(255,215,0,0.5)] border-0">
