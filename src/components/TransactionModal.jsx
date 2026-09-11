@@ -1,31 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { getCategories, saveTransaction } from '../utils/storage';
+import { getCategories, saveTransaction, getGoals } from '../utils/storage';
 import { useToast } from '../context/ToastContext';
 
 const TransactionModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
   const [categories, setCategories] = useState([]);
+  const [goals, setGoals] = useState([]);
   const toast = useToast();
 
   const [type, setType] = useState('expense');
   const [amount, setAmount] = useState('');
   const [categoryId, setCategoryId] = useState('');
+  const [goalId, setGoalId] = useState('');
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
-      getCategories().then(cats => {
+      Promise.all([getCategories(), getGoals()]).then(([cats, allGoals]) => {
         setCategories(cats);
+        setGoals(allGoals.filter(g => !g.isCompleted));
         if (initialData) {
           setType(initialData.type);
           setAmount(initialData.amount);
           setCategoryId(initialData.categoryId);
+          setGoalId(initialData.goalId || '');
           setNote(initialData.note || '');
         } else {
           setType('expense');
           setAmount('');
           setCategoryId(cats.find(c => c.type === 'expense')?.id || '');
+          setGoalId('');
           setNote('');
         }
       });
@@ -41,6 +46,7 @@ const TransactionModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
       type,
       amount: Number(amount),
       categoryId,
+      goalId: type === 'expense' ? (goalId || null) : null,
       note,
       date: initialData?.date || new Date().toISOString()
     };
@@ -131,6 +137,36 @@ const TransactionModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
               ))}
             </div>
           </div>
+
+          {type === 'expense' && goals.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Link to a goal (optional)</label>
+              <div className="flex gap-2 flex-wrap mt-2">
+                <button
+                  type="button"
+                  onClick={() => setGoalId('')}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
+                    !goalId ? 'bg-brand-charcoal text-white dark:bg-white dark:text-brand-charcoal' : 'bg-gray-100 dark:bg-brand-darkBorder text-gray-500 dark:text-gray-400'
+                  }`}
+                >
+                  None
+                </button>
+                {goals.map(g => (
+                  <button
+                    type="button"
+                    key={g.id}
+                    onClick={() => setGoalId(g.id)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
+                      goalId === g.id ? 'shadow-md scale-105' : 'opacity-70 hover:opacity-100'
+                    }`}
+                    style={{ backgroundColor: goalId === g.id ? g.color : `${g.color}20`, color: goalId === g.id ? '#2D3142' : g.color }}
+                  >
+                    {g.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Note (Optional)</label>

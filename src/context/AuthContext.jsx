@@ -65,6 +65,11 @@ export const AuthProvider = ({ children }) => {
     if (error) throw error;
   };
 
+  const updateIncomeEstimate = async (amount) => {
+    const { error } = await supabase.auth.updateUser({ data: { monthly_income_estimate: amount } });
+    if (error) throw error;
+  };
+
   const value = {
     session,
     user: session?.user ?? null,
@@ -77,6 +82,7 @@ export const AuthProvider = ({ children }) => {
     updatePassword,
     markOnboarded,
     markIntroSeen,
+    updateIncomeEstimate,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

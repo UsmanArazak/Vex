@@ -93,6 +93,7 @@ export const getTransactions = async () => {
       type: t.type,
       amount: t.amount,
       categoryId: t.category_id,
+      goalId: t.goal_id,
       note: t.note,
       date: t.date,
     }));
@@ -107,6 +108,7 @@ export const saveTransaction = async (transaction) => {
     type: transaction.type,
     amount: transaction.amount,
     category_id: transaction.categoryId,
+    goal_id: transaction.goalId || null,
     note: transaction.note,
     date: transaction.date,
   };

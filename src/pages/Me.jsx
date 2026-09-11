@@ -95,9 +95,11 @@ const SpendingScreen = ({ onBack }) => {
   const [budgets, setBudgets] = useState([]);
   const [budgetModalCategory, setBudgetModalCategory] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   const currentMonthKey = format(new Date(), 'yyyy-MM');
   const now = new Date();
+  const incomeEstimate = Number(user?.user_metadata?.monthly_income_estimate || 0);
 
   const loadAll = async () => {
     const [txs, cats, buds] = await Promise.all([getTransactions(), getCategories(), getBudgets(currentMonthKey)]);
@@ -143,6 +145,7 @@ const SpendingScreen = ({ onBack }) => {
   }, [transactions]);
 
   const maxTrend = Math.max(...monthlyTrend.map(m => m.total), 1);
+  const spentPct = incomeEstimate > 0 ? Math.round((monthExpense / incomeEstimate) * 100) : 0;
 
   return (
     <div className="p-6 pt-12 pb-24 space-y-6">
@@ -164,6 +167,23 @@ const SpendingScreen = ({ onBack }) => {
             {loading ? <div className="skeleton w-20 h-7 bg-white/10" /> : <p className="text-2xl font-black text-emerald-400">{formatCurrency(monthIncome)}</p>}
           </div>
         </div>
+
+        {incomeEstimate > 0 && (
+          <div className="mt-4 pt-4 border-t border-gray-700/60">
+            <div className="flex justify-between items-center mb-1.5">
+              <span className="text-xs font-bold text-gray-300">
+                {spentPct}% of your income spent this month
+              </span>
+              <span className="text-xs text-gray-400">of {formatCurrency(incomeEstimate)}</span>
+            </div>
+            <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all duration-700 ${spentPct >= 100 ? 'bg-danger' : spentPct >= 70 ? 'bg-warning' : 'bg-brand-gold'}`}
+                style={{ width: `${Math.min(100, spentPct)}%` }}
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       <section className="card p-5 border border-gray-100 dark:border-brand-darkBorder shadow-sm">
@@ -277,10 +297,13 @@ const SettingsScreen = ({ onBack }) => {
   const [editingRule, setEditingRule] = useState(null);
   const [recurringRules, setRecurringRules] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [income, setIncome] = useState('');
+  const [savingIncome, setSavingIncome] = useState(false);
   const fileInputRef = useRef(null);
   const toast = useToast();
   const confirm = useConfirm();
   const { theme, setTheme } = useTheme();
+  const { user, updateIncomeEstimate } = useAuth();
 
   const loadRecurring = async () => {
     const [rules, cats] = await Promise.all([getRecurringRules(), getCategories()]);
@@ -288,7 +311,22 @@ const SettingsScreen = ({ onBack }) => {
     setCategories(cats);
   };
 
-  useEffect(() => { loadRecurring(); }, []);
+  useEffect(() => {
+    loadRecurring();
+    setIncome(user?.user_metadata?.monthly_income_estimate ? String(user.user_metadata.monthly_income_estimate) : '');
+  }, []);
+
+  const handleSaveIncome = async () => {
+    setSavingIncome(true);
+    try {
+      await updateIncomeEstimate(income ? Number(income) : null);
+      toast.success('Income updated');
+    } catch (err) {
+      toast.error(err.message || 'Failed to update income');
+    } finally {
+      setSavingIncome(false);
+    }
+  };
 
   const getCategoryName = (id) => categories.find(c => c.id === id)?.name || 'Uncategorized';
 
@@ -370,6 +408,32 @@ const SettingsScreen = ({ onBack }) => {
                 {opt.label}
               </button>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Income */}
+      <section>
+        <h2 className="font-bold text-xl mb-4">Monthly Income</h2>
+        <div className="card border border-gray-100 dark:border-brand-darkBorder shadow-sm p-5">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Used to show how much of your income you're spending each month.</p>
+          <div className="flex gap-2">
+            <input
+              type="number"
+              inputMode="decimal"
+              min="0"
+              value={income}
+              onChange={(e) => setIncome(e.target.value)}
+              className="flex-1 p-3 rounded-xl border border-gray-200 dark:border-brand-darkBorder dark:bg-brand-dark dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-gold font-bold"
+              placeholder="e.g. 250000"
+            />
+            <button
+              onClick={handleSaveIncome}
+              disabled={savingIncome}
+              className="btn-primary px-5 disabled:opacity-50"
+            >
+              {savingIncome ? '…' : 'Save'}
+            </button>
           </div>
         </div>
       </section>

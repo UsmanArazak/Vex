@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { getGoals, deleteGoal, saveGoal } from '../utils/storage';
+import { getGoals, deleteGoal, saveGoal, getTransactions } from '../utils/storage';
 import GoalModal from '../components/GoalModal';
 import { format, parse } from 'date-fns';
 import { useConfirm } from '../context/ConfirmContext';
@@ -8,6 +8,7 @@ import { SkeletonList } from '../components/ui/Skeleton';
 
 const Goals = () => {
   const [goals, setGoals] = useState([]);
+  const [transactions, setTransactions] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeGoal, setActiveGoal] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -17,11 +18,23 @@ const Goals = () => {
   const formatCurrency = (val) => `₦${Number(val).toLocaleString()}`;
 
   const refreshData = async () => {
-    setGoals(await getGoals());
+    const [g, t] = await Promise.all([getGoals(), getTransactions()]);
+    setGoals(g);
+    setTransactions(t);
     setLoading(false);
   };
 
   useEffect(() => { refreshData(); }, []);
+
+  // Real saved amount per goal — sum of every transaction linked to it
+  const savedByGoal = useMemo(() => {
+    const map = {};
+    transactions.forEach(t => {
+      if (!t.goalId) return;
+      map[t.goalId] = (map[t.goalId] || 0) + Number(t.amount);
+    });
+    return map;
+  }, [transactions]);
 
   const handleDelete = async (id) => {
     const ok = await confirm({ title: 'Delete this item?', confirmLabel: 'Delete', danger: true });
@@ -48,6 +61,10 @@ const Goals = () => {
   const totalCost = useMemo(() => {
     return activeGoals.filter(g => g.cost).reduce((acc, g) => acc + g.cost, 0);
   }, [activeGoals]);
+
+  const totalSaved = useMemo(() => {
+    return activeGoals.reduce((acc, g) => acc + (savedByGoal[g.id] || 0), 0);
+  }, [activeGoals, savedByGoal]);
 
   // Group active goals by targetMonth
   const groupedActiveGoals = useMemo(() => {
@@ -91,8 +108,12 @@ const Goals = () => {
       {/* Total cost summary card (Active Goals Only) */}
       <div className="card bg-brand-charcoal text-white p-5 shadow-md border-0 flex items-center justify-between">
         <div>
+          <p className="text-xs text-white/60 font-bold uppercase tracking-wider mb-1">Saved So Far</p>
+          <p className="text-2xl font-bold text-brand-gold">{formatCurrency(totalSaved)}</p>
+        </div>
+        <div className="text-right">
           <p className="text-xs text-white/60 font-bold uppercase tracking-wider mb-1">Total Cost</p>
-          <p className="text-2xl font-bold">{formatCurrency(totalCost)}</p>
+          <p className="text-lg font-bold text-white/80">{formatCurrency(totalCost)}</p>
         </div>
       </div>
 
@@ -108,7 +129,10 @@ const Goals = () => {
               </h3>
               
               <div className="space-y-3 mt-2">
-                {groupedActiveGoals[monthStr].map(goal => (
+                {groupedActiveGoals[monthStr].map(goal => {
+                  const saved = savedByGoal[goal.id] || 0;
+                  const pct = goal.cost ? Math.min(100, Math.round((saved / goal.cost) * 100)) : 0;
+                  return (
                   <div 
                     key={goal.id} 
                     className="card p-4 shadow-sm border border-gray-100 dark:border-brand-darkBorder bg-white dark:bg-brand-darkCard transition-all hover:shadow-md"
@@ -144,8 +168,25 @@ const Goals = () => {
                         </button>
                       </div>
                     </div>
+
+                    {goal.cost ? (
+                      <div className="mt-3 pl-9">
+                        <div className="flex justify-between items-center mb-1.5">
+                          <span className="text-xs font-bold text-gray-500 dark:text-gray-400">{formatCurrency(saved)} saved</span>
+                          <span className="text-xs text-gray-400 dark:text-gray-500">{pct}%</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-gray-100 dark:bg-brand-darkBorder rounded-full overflow-hidden">
+                          <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, backgroundColor: goal.color }} />
+                        </div>
+                      </div>
+                    ) : saved > 0 ? (
+                      <div className="mt-3 pl-9">
+                        <span className="text-xs font-bold text-gray-500 dark:text-gray-400">{formatCurrency(saved)} saved so far</span>
+                      </div>
+                    ) : null}
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           ))
