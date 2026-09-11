@@ -44,8 +44,8 @@ const MeHub = ({ user, onNavigate, onSignOut }) => (
           <p className="text-xs text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">Signed in as</p>
           <p className="font-bold text-brand-charcoal dark:text-white truncate">{user?.email}</p>
         </div>
-        <InfoButton title="About Me" pageKey="me_hub">
-          This page shows your account. From here, you can view your spending or open Settings.
+        <InfoButton title="About Me" pageKey="me_hub_v2">
+          This page shows your account. From here, you can view your spending, manage your budgets, set up repeating payments, or open Settings.
         </InfoButton>
       </header>
 
@@ -58,7 +58,29 @@ const MeHub = ({ user, onNavigate, onSignOut }) => (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D2D2D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
           </div>
           <p className="font-bold text-brand-charcoal dark:text-white text-sm">My Spending</p>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Insights & budgets</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Insights & trends</p>
+        </button>
+
+        <button
+          onClick={() => onNavigate('budgets')}
+          className="card p-5 border border-gray-100 dark:border-brand-darkBorder shadow-sm text-left hover:shadow-md transition-shadow group"
+        >
+          <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center mb-3 group-hover:bg-emerald-200 transition-colors">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 13h3M8 17h6M8 9h1"/></svg>
+          </div>
+          <p className="font-bold text-brand-charcoal dark:text-white text-sm">Budgets</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Set category limits</p>
+        </button>
+
+        <button
+          onClick={() => onNavigate('recurring')}
+          className="card p-5 border border-gray-100 dark:border-brand-darkBorder shadow-sm text-left hover:shadow-md transition-shadow group"
+        >
+          <div className="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-950/40 flex items-center justify-center mb-3 group-hover:bg-sky-200 transition-colors">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0284C7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 2.1l4 4-4 4"/><path d="M3 12.2v-2a4 4 0 0 1 4-4h12.8M7 21.9l-4-4 4-4"/><path d="M21 11.8v2a4 4 0 0 1-4 4H4.2"/></svg>
+          </div>
+          <p className="font-bold text-brand-charcoal dark:text-white text-sm">Recurring</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Repeating payments</p>
         </button>
 
         <button
@@ -69,7 +91,7 @@ const MeHub = ({ user, onNavigate, onSignOut }) => (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D2D2D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           </div>
           <p className="font-bold text-brand-charcoal dark:text-white text-sm">Settings</p>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Appearance, categories & more</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Appearance & more</p>
         </button>
       </div>
     </div>
@@ -99,7 +121,6 @@ const SpendingScreen = ({ onBack }) => {
   const [categories, setCategories] = useState([]);
   const [budgets, setBudgets] = useState([]);
   const [debts, setDebts] = useState([]);
-  const [budgetModalCategory, setBudgetModalCategory] = useState(null);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
@@ -357,68 +378,119 @@ const SpendingScreen = ({ onBack }) => {
         </div>
       </section>
 
-      <section>
-        <h2 className="font-bold text-lg mb-3">Where did it go?</h2>
-        {loading ? (
-          <SkeletonList count={3} />
-        ) : byCategory.length > 0 ? (
-          <div className="space-y-3">
-            {byCategory.map(({ cat, total, count }) => {
-              const pct = monthExpense > 0 ? Math.round((total / monthExpense) * 100) : 0;
-              const budget = getBudgetForCategory(cat.id);
-              const budgetPct = budget ? Math.min(100, Math.round((total / budget.limitAmount) * 100)) : 0;
-              const isOver = budget && total > budget.limitAmount;
-              const barColor = isOver ? '#EF4444' : budgetPct >= 70 ? '#F59E0B' : '#4CAF50';
-              return (
-                <div key={cat.id} className="card p-4 border border-gray-100 dark:border-brand-darkBorder shadow-sm">
-                  <div className="flex justify-between items-center mb-2">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold text-sm" style={{ backgroundColor: cat.color }}>
-                        {cat.name.charAt(0)}
-                      </div>
-                      <div>
-                        <p className="font-bold text-brand-charcoal dark:text-white text-sm">{cat.name}</p>
-                        <p className="text-xs text-gray-400 dark:text-gray-500">{count} transaction{count !== 1 ? 's' : ''}</p>
-                      </div>
+    </div>
+  );
+};
+
+// ============================= BUDGETS =============================
+const BudgetsScreen = ({ onBack }) => {
+  const [transactions, setTransactions] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [budgets, setBudgets] = useState([]);
+  const [budgetModalCategory, setBudgetModalCategory] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const currentMonthKey = format(new Date(), 'yyyy-MM');
+  const now = new Date();
+  const formatCurrency = (val) => `₦${Number(val).toLocaleString()}`;
+  const getCategory = (id) => categories.find(c => c.id === id) || { name: 'Other', color: '#ccc' };
+
+  const loadAll = async () => {
+    const [txs, cats, buds] = await Promise.all([getTransactions(), getCategories(), getBudgets(currentMonthKey)]);
+    setTransactions(txs);
+    setCategories(cats);
+    setBudgets(buds);
+    setLoading(false);
+  };
+
+  useEffect(() => { loadAll(); }, []);
+
+  const getBudgetForCategory = (categoryId) => budgets.find(b => b.categoryId === categoryId) || null;
+
+  const { monthExpense, byCategory } = useMemo(() => {
+    let mExp = 0;
+    const catMap = {};
+    transactions.forEach(t => {
+      if (t.type !== 'expense') return;
+      if (!isSameMonth(parseISO(t.date), now)) return;
+      const amount = Number(t.amount);
+      const cat = getCategory(t.categoryId);
+      mExp += amount;
+      if (!catMap[t.categoryId]) catMap[t.categoryId] = { cat, total: 0, count: 0 };
+      catMap[t.categoryId].total += amount;
+      catMap[t.categoryId].count += 1;
+    });
+    return { monthExpense: mExp, byCategory: Object.values(catMap).sort((a, b) => b.total - a.total) };
+  }, [transactions, categories]);
+
+  return (
+    <div className="p-6 pt-12 pb-24 space-y-6">
+      <BackHeader
+        title="Budgets"
+        onBack={onBack}
+        infoKey="budgets"
+        infoText="This page shows your spending against the monthly limits you set for each category. Tap a category to set or change its budget. We will warn you before you spend too much."
+      />
+
+      {loading ? (
+        <SkeletonList count={3} />
+      ) : byCategory.length > 0 ? (
+        <div className="space-y-3">
+          {byCategory.map(({ cat, total, count }) => {
+            const pct = monthExpense > 0 ? Math.round((total / monthExpense) * 100) : 0;
+            const budget = getBudgetForCategory(cat.id);
+            const budgetPct = budget ? Math.min(100, Math.round((total / budget.limitAmount) * 100)) : 0;
+            const isOver = budget && total > budget.limitAmount;
+            const barColor = isOver ? '#EF4444' : budgetPct >= 70 ? '#F59E0B' : '#4CAF50';
+            return (
+              <div key={cat.id} className="card p-4 border border-gray-100 dark:border-brand-darkBorder shadow-sm">
+                <div className="flex justify-between items-center mb-2">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold text-sm" style={{ backgroundColor: cat.color }}>
+                      {cat.name.charAt(0)}
                     </div>
-                    <div className="text-right">
-                      <p className="font-bold text-red-500 text-sm">{formatCurrency(total)}</p>
-                      <p className="text-xs text-gray-400 dark:text-gray-500">{pct}%</p>
+                    <div>
+                      <p className="font-bold text-brand-charcoal dark:text-white text-sm">{cat.name}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500">{count} transaction{count !== 1 ? 's' : ''}</p>
                     </div>
                   </div>
-                  <div className="h-1.5 w-full bg-gray-100 dark:bg-brand-darkBorder rounded-full overflow-hidden">
-                    <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, backgroundColor: cat.color }} />
-                  </div>
-                  <div className="mt-3 pt-3 border-t border-gray-100 dark:border-brand-darkBorder">
-                    {budget ? (
-                      <button onClick={() => setBudgetModalCategory(cat)} className="w-full text-left">
-                        <div className="flex justify-between items-center mb-1.5">
-                          <span className={`text-xs font-bold ${isOver ? 'text-danger' : 'text-gray-500 dark:text-gray-400'}`}>
-                            {isOver ? `Over by ${formatCurrency(total - budget.limitAmount)}` : `${formatCurrency(budget.limitAmount - total)} left`}
-                          </span>
-                          <span className="text-xs text-gray-400 dark:text-gray-500">Budget: {formatCurrency(budget.limitAmount)}</span>
-                        </div>
-                        <div className="h-1.5 w-full bg-gray-100 dark:bg-brand-darkBorder rounded-full overflow-hidden">
-                          <div className="h-full rounded-full transition-all duration-700" style={{ width: `${budgetPct}%`, backgroundColor: barColor }} />
-                        </div>
-                      </button>
-                    ) : (
-                      <button onClick={() => setBudgetModalCategory(cat)} className="text-xs font-bold text-brand-goldDark dark:text-brand-gold flex items-center gap-1">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
-                        Set a budget
-                      </button>
-                    )}
+                  <div className="text-right">
+                    <p className="font-bold text-red-500 text-sm">{formatCurrency(total)}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500">{pct}%</p>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="text-center p-8 bg-white dark:bg-brand-darkCard rounded-3xl border border-dashed border-gray-200 dark:border-brand-darkBorder">
-            <p className="text-gray-400 dark:text-gray-500 text-sm">No expenses logged this month yet.</p>
-          </div>
-        )}
-      </section>
+                <div className="h-1.5 w-full bg-gray-100 dark:bg-brand-darkBorder rounded-full overflow-hidden">
+                  <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, backgroundColor: cat.color }} />
+                </div>
+                <div className="mt-3 pt-3 border-t border-gray-100 dark:border-brand-darkBorder">
+                  {budget ? (
+                    <button onClick={() => setBudgetModalCategory(cat)} className="w-full text-left">
+                      <div className="flex justify-between items-center mb-1.5">
+                        <span className={`text-xs font-bold ${isOver ? 'text-danger' : 'text-gray-500 dark:text-gray-400'}`}>
+                          {isOver ? `Over by ${formatCurrency(total - budget.limitAmount)}` : `${formatCurrency(budget.limitAmount - total)} left`}
+                        </span>
+                        <span className="text-xs text-gray-400 dark:text-gray-500">Budget: {formatCurrency(budget.limitAmount)}</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-gray-100 dark:bg-brand-darkBorder rounded-full overflow-hidden">
+                        <div className="h-full rounded-full transition-all duration-700" style={{ width: `${budgetPct}%`, backgroundColor: barColor }} />
+                      </div>
+                    </button>
+                  ) : (
+                    <button onClick={() => setBudgetModalCategory(cat)} className="text-xs font-bold text-brand-goldDark dark:text-brand-gold flex items-center gap-1">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                      Set a budget
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="text-center p-8 bg-white dark:bg-brand-darkCard rounded-3xl border border-dashed border-gray-200 dark:border-brand-darkBorder">
+          <p className="text-gray-400 dark:text-gray-500 text-sm">No expenses logged this month yet.</p>
+        </div>
+      )}
 
       <BudgetModal
         isOpen={!!budgetModalCategory}
@@ -435,10 +507,6 @@ const SpendingScreen = ({ onBack }) => {
 // ============================= SETTINGS =============================
 const SettingsScreen = ({ onBack }) => {
   const [isCategoriesModalOpen, setIsCategoriesModalOpen] = useState(false);
-  const [isRecurringModalOpen, setIsRecurringModalOpen] = useState(false);
-  const [editingRule, setEditingRule] = useState(null);
-  const [recurringRules, setRecurringRules] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [income, setIncome] = useState('');
   const [savingIncome, setSavingIncome] = useState(false);
   const fileInputRef = useRef(null);
@@ -447,14 +515,7 @@ const SettingsScreen = ({ onBack }) => {
   const { theme, setTheme } = useTheme();
   const { user, updateIncomeEstimate } = useAuth();
 
-  const loadRecurring = async () => {
-    const [rules, cats] = await Promise.all([getRecurringRules(), getCategories()]);
-    setRecurringRules(rules);
-    setCategories(cats);
-  };
-
   useEffect(() => {
-    loadRecurring();
     setIncome(user?.user_metadata?.monthly_income_estimate ? String(user.user_metadata.monthly_income_estimate) : '');
   }, []);
 
@@ -468,21 +529,6 @@ const SettingsScreen = ({ onBack }) => {
     } finally {
       setSavingIncome(false);
     }
-  };
-
-  const getCategoryName = (id) => categories.find(c => c.id === id)?.name || 'Uncategorized';
-
-  const handleDeleteRule = async (id) => {
-    const ok = await confirm({ title: 'Delete recurring transaction?', confirmLabel: 'Delete', danger: true });
-    if (!ok) return;
-    await deleteRecurringRule(id);
-    toast.success('Recurring transaction deleted');
-    loadRecurring();
-  };
-
-  const toggleRuleActive = async (rule) => {
-    await saveRecurringRule({ ...rule, isActive: !rule.isActive });
-    loadRecurring();
   };
 
   const handleExport = async () => {
@@ -585,52 +631,6 @@ const SettingsScreen = ({ onBack }) => {
         </div>
       </section>
 
-      {/* Recurring Transactions */}
-      <section>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="font-bold text-xl">Recurring</h2>
-          <button
-            onClick={() => { setEditingRule(null); setIsRecurringModalOpen(true); }}
-            className="text-xs font-bold text-brand-goldDark dark:text-brand-gold flex items-center gap-1"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
-            Add
-          </button>
-        </div>
-        {recurringRules.length === 0 ? (
-          <div className="card border border-dashed border-gray-200 dark:border-brand-darkBorder shadow-none p-5 text-center">
-            <p className="text-sm text-gray-400 dark:text-gray-500">No recurring transactions yet — rent, salary, subscriptions, etc.</p>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {recurringRules.map(rule => (
-              <div key={rule.id} className="card p-4 border border-gray-100 dark:border-brand-darkBorder shadow-sm flex items-center justify-between gap-3">
-                <button className="flex-1 text-left min-w-0" onClick={() => { setEditingRule(rule); setIsRecurringModalOpen(true); }}>
-                  <p className="font-bold text-brand-charcoal dark:text-white text-sm truncate">
-                    {rule.note || getCategoryName(rule.categoryId)}
-                  </p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500">
-                    {FREQ_LABEL[rule.frequency]} · ₦{Number(rule.amount).toLocaleString()} · {rule.type === 'expense' ? 'Expense' : 'Income'}
-                  </p>
-                </button>
-                <div className="flex items-center gap-2 shrink-0">
-                  <button
-                    onClick={() => toggleRuleActive(rule)}
-                    className={`w-9 h-5 rounded-full relative transition-colors ${rule.isActive ? 'bg-brand-gold' : 'bg-gray-200 dark:bg-brand-darkBorder'}`}
-                    title={rule.isActive ? 'Active' : 'Paused'}
-                  >
-                    <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${rule.isActive ? 'translate-x-4' : 'translate-x-0.5'}`} />
-                  </button>
-                  <button onClick={() => handleDeleteRule(rule.id)} className="text-gray-300 hover:text-danger transition-colors">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
       {/* Categories */}
       <section>
         <h2 className="font-bold text-xl mb-4">Categories</h2>
@@ -682,6 +682,94 @@ const SettingsScreen = ({ onBack }) => {
       </section>
 
       <CategoriesListModal isOpen={isCategoriesModalOpen} onClose={() => setIsCategoriesModalOpen(false)} />
+    </div>
+  );
+};
+
+// ============================= RECURRING =============================
+const RecurringScreen = ({ onBack }) => {
+  const [isRecurringModalOpen, setIsRecurringModalOpen] = useState(false);
+  const [editingRule, setEditingRule] = useState(null);
+  const [recurringRules, setRecurringRules] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const toast = useToast();
+  const confirm = useConfirm();
+
+  const loadRecurring = async () => {
+    const [rules, cats] = await Promise.all([getRecurringRules(), getCategories()]);
+    setRecurringRules(rules);
+    setCategories(cats);
+  };
+
+  useEffect(() => { loadRecurring(); }, []);
+
+  const getCategoryName = (id) => categories.find(c => c.id === id)?.name || 'Uncategorized';
+
+  const handleDeleteRule = async (id) => {
+    const ok = await confirm({ title: 'Delete recurring transaction?', confirmLabel: 'Delete', danger: true });
+    if (!ok) return;
+    await deleteRecurringRule(id);
+    toast.success('Recurring transaction deleted');
+    loadRecurring();
+  };
+
+  const toggleRuleActive = async (rule) => {
+    await saveRecurringRule({ ...rule, isActive: !rule.isActive });
+    loadRecurring();
+  };
+
+  return (
+    <div className="p-6 pt-12 pb-24 space-y-6">
+      <BackHeader
+        title="Recurring"
+        onBack={onBack}
+        infoKey="recurring"
+        infoText="Recurring transactions are payments or income that repeat, such as rent, salary, or a subscription. Add one here, and we will record it for you automatically on each date, so you do not have to remember to enter it every time."
+      />
+
+      <div className="flex justify-end">
+        <button
+          onClick={() => { setEditingRule(null); setIsRecurringModalOpen(true); }}
+          className="text-xs font-bold text-brand-goldDark dark:text-brand-gold flex items-center gap-1"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          Add
+        </button>
+      </div>
+
+      {recurringRules.length === 0 ? (
+        <div className="card border border-dashed border-gray-200 dark:border-brand-darkBorder shadow-none p-5 text-center">
+          <p className="text-sm text-gray-400 dark:text-gray-500">No recurring transactions yet — rent, salary, subscriptions, etc.</p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {recurringRules.map(rule => (
+            <div key={rule.id} className="card p-4 border border-gray-100 dark:border-brand-darkBorder shadow-sm flex items-center justify-between gap-3">
+              <button className="flex-1 text-left min-w-0" onClick={() => { setEditingRule(rule); setIsRecurringModalOpen(true); }}>
+                <p className="font-bold text-brand-charcoal dark:text-white text-sm truncate">
+                  {rule.note || getCategoryName(rule.categoryId)}
+                </p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">
+                  {FREQ_LABEL[rule.frequency]} · ₦{Number(rule.amount).toLocaleString()} · {rule.type === 'expense' ? 'Expense' : 'Income'}
+                </p>
+              </button>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={() => toggleRuleActive(rule)}
+                  className={`w-9 h-5 rounded-full relative transition-colors ${rule.isActive ? 'bg-brand-gold' : 'bg-gray-200 dark:bg-brand-darkBorder'}`}
+                  title={rule.isActive ? 'Active' : 'Paused'}
+                >
+                  <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${rule.isActive ? 'translate-x-4' : 'translate-x-0.5'}`} />
+                </button>
+                <button onClick={() => handleDeleteRule(rule.id)} className="text-gray-300 hover:text-danger transition-colors">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       <RecurringModal
         isOpen={isRecurringModalOpen}
         onClose={() => setIsRecurringModalOpen(false)}
@@ -698,6 +786,8 @@ const Me = () => {
   const { user, signOut } = useAuth();
 
   if (screen === 'spending') return <SpendingScreen onBack={() => setScreen('hub')} />;
+  if (screen === 'budgets') return <BudgetsScreen onBack={() => setScreen('hub')} />;
+  if (screen === 'recurring') return <RecurringScreen onBack={() => setScreen('hub')} />;
   if (screen === 'settings') return <SettingsScreen onBack={() => setScreen('hub')} />;
   return <MeHub user={user} onNavigate={setScreen} onSignOut={signOut} />;
 };
