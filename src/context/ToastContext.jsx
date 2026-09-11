@@ -16,10 +16,12 @@ const ICONS = {
   ),
 };
 
-const STYLES = {
-  success: 'bg-brand-charcoal dark:bg-brand-darkCard text-white border-l-4 border-success',
-  error: 'bg-brand-charcoal dark:bg-brand-darkCard text-white border-l-4 border-danger',
-  info: 'bg-brand-charcoal dark:bg-brand-darkCard text-white border-l-4 border-info',
+const STYLES = 'bg-brand-charcoal dark:bg-brand-darkCard text-white border border-white/10';
+
+const ICON_BG = {
+  success: 'bg-success/15 text-success',
+  error: 'bg-danger/15 text-danger',
+  info: 'bg-info/15 text-info',
 };
 
 export const ToastProvider = ({ children }) => {
@@ -57,13 +59,13 @@ export const ToastProvider = ({ children }) => {
           {toasts.map((t) => (
             <div
               key={t.id}
-              className={`pointer-events-auto max-w-sm w-full sm:w-auto flex items-center gap-2.5 px-4 py-3 rounded-2xl shadow-lg text-sm font-medium ${STYLES[t.type]} ${t.leaving ? 'animate-toast-out' : 'animate-toast-in'}`}
+              className={`pointer-events-auto max-w-sm w-full sm:w-auto flex items-center gap-3 pl-3 pr-4 py-3 rounded-2xl shadow-xl text-sm ${STYLES} ${t.leaving ? 'animate-toast-out' : 'animate-toast-in'}`}
             >
-              <span className={t.type === 'success' ? 'text-success' : t.type === 'error' ? 'text-danger' : 'text-info'}>
+              <span className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${ICON_BG[t.type]}`}>
                 {ICONS[t.type]}
               </span>
-              <span className="flex-1">{t.message}</span>
-              <button onClick={() => dismiss(t.id)} className="text-white/50 hover:text-white/90 transition-colors">
+              <span className="flex-1 font-medium leading-snug">{t.message}</span>
+              <button onClick={() => dismiss(t.id)} className="text-white/40 hover:text-white/80 transition-colors shrink-0">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
               </button>
             </div>
