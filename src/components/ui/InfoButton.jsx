@@ -1,9 +1,22 @@
 // src/components/ui/InfoButton.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
-const InfoButton = ({ title, children }) => {
+const SEEN_KEY_PREFIX = 'mopal_seen_info_';
+
+const InfoButton = ({ title, pageKey, children }) => {
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!pageKey) return;
+    const storageKey = SEEN_KEY_PREFIX + pageKey;
+    if (!localStorage.getItem(storageKey)) {
+      setOpen(true);
+      localStorage.setItem(storageKey, 'true');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <>
       <button

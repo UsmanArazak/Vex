@@ -22,13 +22,13 @@ const THEME_OPTIONS = [
 ];
 const FREQ_LABEL = { daily: 'Daily', weekly: 'Weekly', monthly: 'Monthly' };
 
-const BackHeader = ({ title, onBack, infoTitle, infoText }) => (
+const BackHeader = ({ title, onBack, infoTitle, infoText, infoKey }) => (
   <header className="flex items-center gap-3 mb-6">
     <button onClick={onBack} className="btn-icon">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
     </button>
     <h1 className="text-2xl font-bold text-brand-charcoal dark:text-white">{title}</h1>
-    {infoText && <InfoButton title={infoTitle || `About ${title}`}>{infoText}</InfoButton>}
+    {infoText && <InfoButton title={infoTitle || `About ${title}`} pageKey={infoKey}>{infoText}</InfoButton>}
   </header>
 );
 
@@ -44,7 +44,7 @@ const MeHub = ({ user, onNavigate, onSignOut }) => (
           <p className="text-xs text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">Signed in as</p>
           <p className="font-bold text-brand-charcoal dark:text-white truncate">{user?.email}</p>
         </div>
-        <InfoButton title="About Me">
+        <InfoButton title="About Me" pageKey="me_hub">
           This page shows your account. From here, you can view your spending or open Settings.
         </InfoButton>
       </header>
@@ -157,6 +157,7 @@ const SpendingScreen = ({ onBack }) => {
       <BackHeader
         title="My Spending"
         onBack={onBack}
+        infoKey="spending"
         infoText="This page shows how much you have spent and earned this month, and your budgets, so you can see if you are spending too much in any category."
       />
 
@@ -401,6 +402,7 @@ const SettingsScreen = ({ onBack }) => {
       <BackHeader
         title="Settings"
         onBack={onBack}
+        infoKey="settings"
         infoText="This page lets you change how the app looks, manage your categories, set up repeating payments, back up your data, or sign out."
       />
 

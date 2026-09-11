@@ -99,7 +99,7 @@ const Goals = () => {
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center gap-2">
           <h1 className="text-3xl font-bold text-brand-charcoal dark:text-white">Bucket List</h1>
-          <InfoButton title="About Goals">
+          <InfoButton title="About Goals" pageKey="goals">
             This page helps you save toward something you want, such as a phone or rent. Add an item and a cost. When you record a transaction, you can link it to a goal, and the page will show how much you have saved.
           </InfoButton>
         </div>

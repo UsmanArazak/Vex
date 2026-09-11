@@ -63,7 +63,7 @@ const Transactions = () => {
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-2">
           <h1 className="text-3xl font-bold text-brand-charcoal dark:text-white">Activity</h1>
-          <InfoButton title="About Activity">
+          <InfoButton title="About Activity" pageKey="activity">
             This page shows every payment and income you have recorded. You can filter them, edit any entry, or delete one.
           </InfoButton>
         </div>

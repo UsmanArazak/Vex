@@ -49,7 +49,7 @@ const Debts = () => {
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-2">
           <h1 className="text-3xl font-bold text-brand-charcoal dark:text-white">Debts</h1>
-          <InfoButton title="About Debts">
+          <InfoButton title="About Debts" pageKey="debts">
             This page helps you keep track of money people owe you, and money you owe other people. Add a name, an amount, and a date.
           </InfoButton>
         </div>
