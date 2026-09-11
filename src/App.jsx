@@ -10,17 +10,20 @@ import LandingPage from './pages/LandingPage';
 import IntroCarousel from './pages/IntroCarousel';
 import ResetPassword from './pages/ResetPassword';
 import Onboarding from './pages/Onboarding';
+import AdminDashboard from './pages/AdminDashboard';
 import TransactionModal from './components/TransactionModal';
 import { useAuth } from './context/AuthContext';
 import { runDueRecurringRules } from './utils/storage';
 import { useToast } from './context/ToastContext';
 
 function App() {
-  const { session, loading, isPasswordRecovery, markIntroSeen } = useAuth();
+  const { session, loading, isPasswordRecovery, markIntroSeen, signOut } = useAuth();
   const toast = useToast();
   const [justOnboarded, setJustOnboarded] = useState(false);
   const [hasSeenIntro, setHasSeenIntro] = useState(false);
   const [authScreen, setAuthScreen] = useState(null); // null (landing) | 'login' | 'signup'
+  const isAdminAccount = session?.user?.app_metadata?.is_admin === true;
+  const [viewMode, setViewMode] = useState('admin'); // 'admin' | 'personal' — only relevant for admin account
   const [currentPath, setCurrentPath] = useState(() => {
     return localStorage.getItem('mopal_current_path') || 'dashboard';
   });
@@ -86,6 +89,12 @@ function App() {
     return <Auth initialMode={authScreen} />;
   }
 
+  // The admin account lands here by default and can switch to its personal
+  // account view from within either side.
+  if (isAdminAccount && viewMode === 'admin') {
+    return <AdminDashboard onSwitchToPersonal={() => setViewMode('personal')} onSignOut={signOut} />;
+  }
+
   // Post-login setup: first the feature intro, then personalization.
   if (!session.user.user_metadata?.intro_seen && !hasSeenIntro) {
     return (
@@ -109,6 +118,8 @@ function App() {
         currentPath={currentPath} 
         onNavigate={navigate} 
         onOpenAdd={() => setIsGlobalAddOpen(true)}
+        isAdminAccount={isAdminAccount}
+        onSwitchToAdmin={() => setViewMode('admin')}
       >
         <div key={refreshKey} className="h-full">
           {renderContent()}

@@ -3,7 +3,7 @@ import { Home, List, Target, Settings, Plus, Banknote, User, LogOut } from 'luci
 import { useAuth } from '../context/AuthContext';
 import InstallPrompt from './InstallPrompt';
 
-const Layout = ({ children, currentPath, onNavigate, onOpenAdd }) => {
+const Layout = ({ children, currentPath, onNavigate, onOpenAdd, isAdminAccount, onSwitchToAdmin }) => {
   const { signOut } = useAuth();
   // Mobile bottom nav stays exactly as-is — "Me" is intentionally not here.
   const navItems = [
@@ -50,6 +50,15 @@ const Layout = ({ children, currentPath, onNavigate, onOpenAdd }) => {
             })}
           </nav>
 
+          {isAdminAccount && (
+            <button
+              onClick={onSwitchToAdmin}
+              className="w-full flex items-center justify-center gap-2 bg-brand-charcoal text-brand-gold font-semibold py-3 rounded-xl hover:bg-gray-800 transition-colors mb-2"
+            >
+              Admin Dashboard
+            </button>
+          )}
+
           {currentPath === 'dashboard' ? (
             <button
               onClick={signOut}
@@ -71,6 +80,14 @@ const Layout = ({ children, currentPath, onNavigate, onOpenAdd }) => {
           <div className="w-full max-w-md md:max-w-4xl bg-brand-gray dark:bg-brand-dark h-screen md:h-auto md:min-h-screen relative shadow-2xl md:shadow-none flex flex-col overflow-hidden md:overflow-visible">
 
             <InstallPrompt />
+            {isAdminAccount && (
+              <button
+                onClick={onSwitchToAdmin}
+                className="md:hidden mx-6 mt-3 flex items-center justify-center gap-2 bg-brand-charcoal text-brand-gold font-semibold text-sm py-2.5 rounded-xl"
+              >
+                Switch to Admin Dashboard
+              </button>
+            )}
             <main className="flex-1 overflow-y-auto md:overflow-visible pb-24 md:pb-16 hide-scrollbar">
               {children}
             </main>
