@@ -777,10 +777,10 @@ const RecurringScreen = ({ onBack }) => {
               <div className="flex items-center gap-2 shrink-0">
                 <button
                   onClick={() => toggleRuleActive(rule)}
-                  className={`w-9 h-5 rounded-full relative transition-colors ${rule.isActive ? 'bg-brand-gold' : 'bg-gray-200 dark:bg-brand-darkBorder'}`}
+                  className={`w-10 h-6 rounded-full relative transition-colors duration-200 shrink-0 ${rule.isActive ? 'bg-brand-gold' : 'bg-gray-200 dark:bg-brand-darkBorder'}`}
                   title={rule.isActive ? 'Active' : 'Paused'}
                 >
-                  <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${rule.isActive ? 'translate-x-4' : 'translate-x-0.5'}`} />
+                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-md transition-transform duration-200 ${rule.isActive ? 'translate-x-4' : 'translate-x-0'}`} />
                 </button>
                 <button onClick={() => handleDeleteRule(rule.id)} className="text-gray-300 hover:text-danger transition-colors">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>
