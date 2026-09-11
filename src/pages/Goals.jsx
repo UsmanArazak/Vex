@@ -58,6 +58,9 @@ const Goals = () => {
   // Summary total cost of UNCOMPLETED (active) goals
   const activeGoals = useMemo(() => goals.filter(g => !g.isCompleted), [goals]);
   const completedGoals = useMemo(() => goals.filter(g => g.isCompleted), [goals]);
+  const totalCompletedCost = useMemo(() => {
+    return completedGoals.filter(g => g.cost).reduce((acc, g) => acc + g.cost, 0);
+  }, [completedGoals]);
 
   const totalCost = useMemo(() => {
     return activeGoals.filter(g => g.cost).reduce((acc, g) => acc + g.cost, 0);
@@ -85,7 +88,7 @@ const Goals = () => {
   }, [activeGoals]);
 
   const formatMonth = (monthStr) => {
-    if (!monthStr) return 'Unplanned';
+    if (!monthStr || monthStr === 'null') return 'Unplanned';
     try {
       const date = parse(monthStr, 'yyyy-MM', new Date());
       return format(date, 'MMMM yyyy');
@@ -98,7 +101,7 @@ const Goals = () => {
     <div className="p-6 pt-12 pb-24 space-y-6">
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center gap-2">
-          <h1 className="text-3xl font-bold text-brand-charcoal dark:text-white">Bucket List</h1>
+          <h1 className="text-3xl font-bold text-brand-charcoal dark:text-white">Goals</h1>
           <InfoButton title="About Goals" pageKey="goals">
             This page helps you save toward something you want, such as a phone or rent. Add an item and a cost. When you record a transaction, you can link it to a goal, and the page will show how much you have saved.
           </InfoButton>
@@ -152,7 +155,7 @@ const Goals = () => {
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                         </button>
                         
-                        <div className="flex items-center gap-2 min-w-0">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
                           <span className="w-3 h-3 shrink-0 rounded-full" style={{ backgroundColor: goal.color }}></span>
                           <h4 className="font-bold text-brand-charcoal dark:text-white truncate">
                             {goal.name}
@@ -198,7 +201,7 @@ const Goals = () => {
           ))
         ) : (
           <div className="text-center p-8 bg-white dark:bg-brand-darkCard rounded-3xl border border-dashed border-gray-200 dark:border-brand-darkBorder">
-            <p className="text-gray-400 dark:text-gray-500 mb-4">Your bucket list is empty. What's next on your wish list?</p>
+            <p className="text-gray-400 dark:text-gray-500 mb-4">Your goals list is empty. What's next on your wish list?</p>
             <button onClick={() => { setActiveGoal(null); setIsModalOpen(true); }} className="text-brand-gold font-bold">Add your first item</button>
           </div>
         )}
@@ -208,6 +211,12 @@ const Goals = () => {
       {completedGoals.length > 0 && (
         <div className="pt-6 border-t border-gray-200 dark:border-brand-darkBorder">
           <h3 className="font-bold text-lg text-gray-500 dark:text-gray-400 mb-3">Completed ({completedGoals.length})</h3>
+          {totalCompletedCost > 0 && (
+            <div className="card bg-gray-100 dark:bg-brand-darkBorder p-4 shadow-none border-0 mb-3 flex items-center justify-between">
+              <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Completed</p>
+              <p className="text-lg font-bold text-brand-charcoal dark:text-white">{formatCurrency(totalCompletedCost)}</p>
+            </div>
+          )}
           <div className="space-y-3">
             {completedGoals.map(goal => (
               <div 
@@ -222,7 +231,7 @@ const Goals = () => {
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                   </button>
                   
-                  <div className="flex items-center gap-2 min-w-0">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
                     <span className="w-3 h-3 shrink-0 rounded-full" style={{ backgroundColor: goal.color }}></span>
                     <h4 className="font-bold text-gray-400 dark:text-gray-500 line-through truncate">
                       {goal.name}
