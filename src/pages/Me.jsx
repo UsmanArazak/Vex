@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
-  getTransactions, getCategories, getBudgets,
+  getTransactions, getCategories, getBudgets, getDebts,
   exportData, importData, clearAllData,
   getRecurringRules, saveRecurringRule, deleteRecurringRule,
 } from '../utils/storage';
@@ -98,6 +98,7 @@ const SpendingScreen = ({ onBack }) => {
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [budgets, setBudgets] = useState([]);
+  const [debts, setDebts] = useState([]);
   const [budgetModalCategory, setBudgetModalCategory] = useState(null);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
@@ -107,10 +108,11 @@ const SpendingScreen = ({ onBack }) => {
   const incomeEstimate = Number(user?.user_metadata?.monthly_income_estimate || 0);
 
   const loadAll = async () => {
-    const [txs, cats, buds] = await Promise.all([getTransactions(), getCategories(), getBudgets(currentMonthKey)]);
+    const [txs, cats, buds, debtsList] = await Promise.all([getTransactions(), getCategories(), getBudgets(currentMonthKey), getDebts()]);
     setTransactions(txs);
     setCategories(cats);
     setBudgets(buds);
+    setDebts(debtsList);
     setLoading(false);
   };
 
@@ -208,6 +210,49 @@ const SpendingScreen = ({ onBack }) => {
     return list.slice(0, 3);
   }, [byCategory, lastMonthByCategory, incomeEstimate, spentPct]);
 
+  // Financial Health Score (0-100) — savings rate (40pts) + budget
+  // adherence (30pts) + debt balance (30pts). Fully computed from this
+  // person's own numbers, no external calls.
+  const healthScore = useMemo(() => {
+    const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
+
+    // Savings rate: how much of income is left after this month's spending
+    let savingsScore;
+    if (incomeEstimate > 0) {
+      const savingsRate = (incomeEstimate - monthExpense) / incomeEstimate;
+      savingsScore = clamp(Math.round(((savingsRate + 0.3) / 0.6) * 40), 0, 40);
+    } else {
+      savingsScore = 20; // neutral — no income set yet
+    }
+
+    // Budget adherence: share of budgeted categories still within limit
+    let budgetScore;
+    if (budgets.length === 0) {
+      budgetScore = 20; // neutral — no budgets set yet
+    } else {
+      const withinBudget = budgets.filter(b => {
+        const spent = byCategory.find(c => c.cat.id === b.categoryId)?.total || 0;
+        return spent <= b.limitAmount;
+      }).length;
+      budgetScore = Math.round((withinBudget / budgets.length) * 30);
+    }
+
+    // Debt balance: being owed more than you owe is healthier
+    const totalOwedToMe = debts.filter(d => d.type === 'owed_to_me').reduce((a, d) => a + Number(d.amount), 0);
+    const totalIOwe = debts.filter(d => d.type === 'i_owe').reduce((a, d) => a + Number(d.amount), 0);
+    let debtScore;
+    if (totalOwedToMe + totalIOwe === 0) {
+      debtScore = 30; // neutral — no debts tracked
+    } else {
+      debtScore = Math.round((totalOwedToMe / (totalOwedToMe + totalIOwe)) * 30);
+    }
+
+    const total = savingsScore + budgetScore + debtScore;
+    const band = total >= 70 ? 'Good' : total >= 40 ? 'Fair' : 'Needs attention';
+    const color = total >= 70 ? '#4CAF50' : total >= 40 ? '#F59E0B' : '#EF4444';
+    return { total, band, color };
+  }, [incomeEstimate, monthExpense, budgets, byCategory, debts]);
+
   return (
     <div className="p-6 pt-12 pb-24 space-y-6">
       <BackHeader
@@ -216,6 +261,21 @@ const SpendingScreen = ({ onBack }) => {
         infoKey="spending"
         infoText="This page shows how much you have spent and earned this month, and your budgets, so you can see if you are spending too much in any category."
       />
+
+      {!loading && (
+        <div className="card p-5 border border-gray-100 dark:border-brand-darkBorder shadow-sm flex items-center gap-4">
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center shrink-0 border-4"
+            style={{ borderColor: healthScore.color }}
+          >
+            <span className="text-xl font-black text-brand-charcoal dark:text-white">{healthScore.total}</span>
+          </div>
+          <div>
+            <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Financial Health Score</p>
+            <p className="font-bold" style={{ color: healthScore.color }}>{healthScore.band}</p>
+          </div>
+        </div>
+      )}
 
       <div className="card p-5 bg-gradient-to-br from-brand-charcoal to-gray-800 text-white shadow-md border-0">
         <div className="flex justify-between items-center mb-3">
