@@ -13,6 +13,7 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { useConfirm } from '../context/ConfirmContext';
 import { useTheme } from '../context/ThemeContext';
+import InfoButton from '../components/ui/InfoButton';
 
 const THEME_OPTIONS = [
   { value: 'light', label: 'Light' },
@@ -21,12 +22,13 @@ const THEME_OPTIONS = [
 ];
 const FREQ_LABEL = { daily: 'Daily', weekly: 'Weekly', monthly: 'Monthly' };
 
-const BackHeader = ({ title, onBack }) => (
+const BackHeader = ({ title, onBack, infoTitle, infoText }) => (
   <header className="flex items-center gap-3 mb-6">
     <button onClick={onBack} className="btn-icon">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
     </button>
     <h1 className="text-2xl font-bold text-brand-charcoal dark:text-white">{title}</h1>
+    {infoText && <InfoButton title={infoTitle || `About ${title}`}>{infoText}</InfoButton>}
   </header>
 );
 
@@ -38,10 +40,13 @@ const MeHub = ({ user, onNavigate, onSignOut }) => (
         <div className="w-14 h-14 rounded-full bg-brand-gold flex items-center justify-center shadow-md shrink-0">
           <span className="font-black text-brand-charcoal text-lg">{(user?.email || '?').charAt(0).toUpperCase()}</span>
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="text-xs text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">Signed in as</p>
           <p className="font-bold text-brand-charcoal dark:text-white truncate">{user?.email}</p>
         </div>
+        <InfoButton title="About Me">
+          This page shows your account. From here, you can view your spending or open Settings.
+        </InfoButton>
       </header>
 
       <div className="grid grid-cols-2 gap-3">
@@ -149,7 +154,11 @@ const SpendingScreen = ({ onBack }) => {
 
   return (
     <div className="p-6 pt-12 pb-24 space-y-6">
-      <BackHeader title="My Spending" onBack={onBack} />
+      <BackHeader
+        title="My Spending"
+        onBack={onBack}
+        infoText="This page shows how much you have spent and earned this month, and your budgets, so you can see if you are spending too much in any category."
+      />
 
       <div className="card p-5 bg-gradient-to-br from-brand-charcoal to-gray-800 text-white shadow-md border-0">
         <div className="flex justify-between items-center mb-3">
@@ -389,7 +398,11 @@ const SettingsScreen = ({ onBack }) => {
 
   return (
     <div className="p-6 pt-12 pb-24 space-y-8">
-      <BackHeader title="Settings" onBack={onBack} />
+      <BackHeader
+        title="Settings"
+        onBack={onBack}
+        infoText="This page lets you change how the app looks, manage your categories, set up repeating payments, back up your data, or sign out."
+      />
 
       {/* Appearance */}
       <section>

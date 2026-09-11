@@ -5,6 +5,7 @@ import { format, parseISO } from 'date-fns';
 import { useConfirm } from '../context/ConfirmContext';
 import { useToast } from '../context/ToastContext';
 import { SkeletonList } from '../components/ui/Skeleton';
+import InfoButton from '../components/ui/InfoButton';
 
 const formatCurrency = (val) => `₦${Number(val).toLocaleString()}`;
 
@@ -46,7 +47,12 @@ const Debts = () => {
     <div className="p-6 pt-12 pb-24">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-brand-charcoal dark:text-white">Debts</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-3xl font-bold text-brand-charcoal dark:text-white">Debts</h1>
+          <InfoButton title="About Debts">
+            This page helps you keep track of money people owe you, and money you owe other people. Add a name, an amount, and a date.
+          </InfoButton>
+        </div>
         <button
           onClick={() => { setActiveDebt(null); setIsModalOpen(true); }}
           className="bg-brand-charcoal text-white px-4 py-2 rounded-xl font-bold text-sm shadow-sm hover:bg-gray-800 transition-colors"

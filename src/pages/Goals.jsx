@@ -5,6 +5,7 @@ import { format, parse } from 'date-fns';
 import { useConfirm } from '../context/ConfirmContext';
 import { useToast } from '../context/ToastContext';
 import { SkeletonList } from '../components/ui/Skeleton';
+import InfoButton from '../components/ui/InfoButton';
 
 const Goals = () => {
   const [goals, setGoals] = useState([]);
@@ -96,7 +97,12 @@ const Goals = () => {
   return (
     <div className="p-6 pt-12 pb-24 space-y-6">
       <div className="flex justify-between items-center mb-2">
-        <h1 className="text-3xl font-bold text-brand-charcoal dark:text-white">Bucket List</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-3xl font-bold text-brand-charcoal dark:text-white">Bucket List</h1>
+          <InfoButton title="About Goals">
+            This page helps you save toward something you want, such as a phone or rent. Add an item and a cost. When you record a transaction, you can link it to a goal, and the page will show how much you have saved.
+          </InfoButton>
+        </div>
         <button 
           onClick={() => { setActiveGoal(null); setIsModalOpen(true); }}
           className="bg-brand-charcoal text-white p-2 px-4 rounded-xl shadow-sm font-bold text-sm hover:bg-gray-800 transition-colors"

@@ -4,6 +4,7 @@ import { getTransactions, getCategories, getBudgets } from '../utils/storage';
 import { format, subMonths, isSameMonth, isToday, parseISO } from 'date-fns';
 import { SkeletonLine, SkeletonList } from '../components/ui/Skeleton';
 import { useToast } from '../context/ToastContext';
+import InfoButton from '../components/ui/InfoButton';
 
 const Dashboard = ({ onNavigate, onOpenAdd }) => {
   const [transactions, setTransactions] = useState([]);
@@ -73,6 +74,9 @@ const Dashboard = ({ onNavigate, onOpenAdd }) => {
         <div className="flex items-center gap-3">
           <img src="/favicon.png" alt="Logo" className="w-10 h-10 object-contain rounded-xl shadow-sm" />
           <h1 className="text-2xl font-bold text-brand-charcoal dark:text-white">Good day 👋</h1>
+          <InfoButton title="About Home">
+            This page shows what you have spent today and your recent activity. Use it to check your money at a glance, every day.
+          </InfoButton>
         </div>
         <button
           onClick={() => onNavigate('me')}

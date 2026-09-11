@@ -5,6 +5,7 @@ import TransactionModal from '../components/TransactionModal';
 import { useConfirm } from '../context/ConfirmContext';
 import { useToast } from '../context/ToastContext';
 import { SkeletonList } from '../components/ui/Skeleton';
+import InfoButton from '../components/ui/InfoButton';
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
@@ -60,7 +61,12 @@ const Transactions = () => {
   return (
     <div className="p-6 pt-12">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-brand-charcoal dark:text-white">Activity</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-3xl font-bold text-brand-charcoal dark:text-white">Activity</h1>
+          <InfoButton title="About Activity">
+            This page shows every payment and income you have recorded. You can filter them, edit any entry, or delete one.
+          </InfoButton>
+        </div>
         <button 
           onClick={() => { setEditingTx(null); setIsModalOpen(true); }}
           className="bg-brand-gold text-brand-charcoal dark:text-white p-2 rounded-xl shadow-sm font-bold text-sm px-4"

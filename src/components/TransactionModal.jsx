@@ -156,11 +156,14 @@ const TransactionModal = ({ isOpen, onClose, initialData = null, onSaved }) => {
                     type="button"
                     key={g.id}
                     onClick={() => setGoalId(g.id)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
-                      goalId === g.id ? 'shadow-md scale-105' : 'opacity-70 hover:opacity-100'
+                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 border ${
+                      goalId === g.id
+                        ? 'shadow-md scale-105 border-transparent'
+                        : 'bg-gray-100 dark:bg-brand-darkBorder text-gray-600 dark:text-gray-300 border-transparent opacity-90 hover:opacity-100'
                     }`}
-                    style={{ backgroundColor: goalId === g.id ? g.color : `${g.color}20`, color: goalId === g.id ? '#2D3142' : g.color }}
+                    style={goalId === g.id ? { backgroundColor: g.color, color: '#2D3142' } : {}}
                   >
+                    <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: g.color }} />
                     {g.name}
                   </button>
                 ))}
