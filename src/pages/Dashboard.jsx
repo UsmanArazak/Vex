@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, AreaChart, Area, XAxis, Tooltip, YAxis } from 'recharts';
-import { getTransactions, getCategories, getBudgets, getDebts } from '../utils/storage';
+import { getTransactions, getCategories, getBudgets, getDebts, getRecurringRules } from '../utils/storage';
 import { format, subMonths, isSameMonth, isToday, isSameWeek, startOfWeek, parseISO } from 'date-fns';
 import { SkeletonLine, SkeletonList } from '../components/ui/Skeleton';
 import { useToast } from '../context/ToastContext';
@@ -16,7 +16,7 @@ const Dashboard = ({ onNavigate, onOpenAdd }) => {
   useEffect(() => {
     (async () => {
       const currentMonthKey = format(new Date(), 'yyyy-MM');
-      const [txs, cats, budgets, debts] = await Promise.all([getTransactions(), getCategories(), getBudgets(currentMonthKey), getDebts()]);
+      const [txs, cats, budgets, debts, recurringRules] = await Promise.all([getTransactions(), getCategories(), getBudgets(currentMonthKey), getDebts(), getRecurringRules()]);
       setTransactions(txs);
       setCategories(cats);
       setLoading(false);
@@ -40,6 +40,16 @@ const Dashboard = ({ onNavigate, onOpenAdd }) => {
       const overdueDebts = debts.filter(d => d.dueDate && parseISO(d.dueDate) < today);
       if (overdueDebts.length > 0) {
         toast.info(`${overdueDebts.length} overdue debt${overdueDebts.length !== 1 ? 's' : ''} — check your Debts page`, 5000);
+      }
+
+      // Gentle one-time reminder for recurring payments due today or tomorrow
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const todayStr = format(today, 'yyyy-MM-dd');
+      const tomorrowStr = format(tomorrow, 'yyyy-MM-dd');
+      const dueSoon = recurringRules.filter(r => r.isActive && (r.nextRunDate === todayStr || r.nextRunDate === tomorrowStr));
+      if (dueSoon.length > 0) {
+        toast.info(`${dueSoon.length} recurring payment${dueSoon.length !== 1 ? 's' : ''} due soon — check Recurring in Me`, 5000);
       }
 
       // Weekly digest — shown once per week, on first visit that week

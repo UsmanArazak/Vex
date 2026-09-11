@@ -705,6 +705,24 @@ const RecurringScreen = ({ onBack }) => {
 
   const getCategoryName = (id) => categories.find(c => c.id === id)?.name || 'Uncategorized';
 
+  const getDueBadge = (rule) => {
+    if (!rule.isActive) return null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const due = new Date(rule.nextRunDate + 'T00:00:00');
+    const diffDays = Math.round((due - today) / 86400000);
+    if (diffDays <= 0) {
+      return <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-red-100 text-red-600 dark:bg-red-950/40 dark:text-red-400">Due today</span>;
+    }
+    if (diffDays === 1) {
+      return <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400">Due tomorrow</span>;
+    }
+    if (diffDays <= 5) {
+      return <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 dark:bg-amber-950/20 dark:text-amber-400">Due in {diffDays} days</span>;
+    }
+    return null;
+  };
+
   const handleDeleteRule = async (id) => {
     const ok = await confirm({ title: 'Delete recurring transaction?', confirmLabel: 'Delete', danger: true });
     if (!ok) return;
@@ -749,9 +767,12 @@ const RecurringScreen = ({ onBack }) => {
                 <p className="font-bold text-brand-charcoal dark:text-white text-sm truncate">
                   {rule.note || getCategoryName(rule.categoryId)}
                 </p>
-                <p className="text-xs text-gray-400 dark:text-gray-500">
-                  {FREQ_LABEL[rule.frequency]} · ₦{Number(rule.amount).toLocaleString()} · {rule.type === 'expense' ? 'Expense' : 'Income'}
-                </p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <p className="text-xs text-gray-400 dark:text-gray-500">
+                    {FREQ_LABEL[rule.frequency]} · ₦{Number(rule.amount).toLocaleString()} · {rule.type === 'expense' ? 'Expense' : 'Income'}
+                  </p>
+                  {getDueBadge(rule)}
+                </div>
               </button>
               <div className="flex items-center gap-2 shrink-0">
                 <button
