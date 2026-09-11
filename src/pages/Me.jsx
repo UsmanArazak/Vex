@@ -55,7 +55,7 @@ const MeHub = ({ user, onNavigate, onSignOut }) => (
           className="card p-5 border border-gray-100 dark:border-brand-darkBorder shadow-sm text-left hover:shadow-md transition-shadow group"
         >
           <div className="w-10 h-10 rounded-xl bg-brand-gold/20 flex items-center justify-center mb-3 group-hover:bg-brand-gold/30 transition-colors">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D2D2D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D2D2D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
           </div>
           <p className="font-bold text-brand-charcoal dark:text-white text-sm">My Spending</p>
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Insights & budgets</p>
@@ -270,9 +270,14 @@ const SpendingScreen = ({ onBack }) => {
           >
             <span className="text-xl font-black text-brand-charcoal dark:text-white">{healthScore.total}</span>
           </div>
-          <div>
-            <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Financial Health Score</p>
-            <p className="font-bold" style={{ color: healthScore.color }}>{healthScore.band}</p>
+          <div className="flex-1 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Financial Health Score</p>
+              <p className="font-bold" style={{ color: healthScore.color }}>{healthScore.band}</p>
+            </div>
+            <InfoButton title="About your Health Score" pageKey="health_score">
+              Your score is based on three things: how much of your income you have left after spending, whether you are staying within your budgets, and whether you are owed more than you owe. A higher score means your money situation is healthier.
+            </InfoButton>
           </div>
         </div>
       )}
@@ -330,7 +335,7 @@ const SpendingScreen = ({ onBack }) => {
         </div>
         <div className="flex items-end justify-between gap-3 h-36 pt-4 pb-1">
           {monthlyTrend.map((m) => {
-            const heightPct = maxTrend > 0 ? Math.max(12, Math.round((m.total / maxTrend) * 100)) : 12;
+            const heightPct = maxTrend > 0 ? Math.round((m.total / maxTrend) * 100) : 0;
             return (
               <div key={m.label} className="flex flex-col items-center gap-2 flex-1 h-full justify-end">
                 <p className={`text-[11px] font-bold ${m.isCurrent ? 'text-brand-charcoal dark:text-white' : 'text-gray-400'}`}>
@@ -559,20 +564,20 @@ const SettingsScreen = ({ onBack }) => {
         <h2 className="font-bold text-xl mb-4">Monthly Income</h2>
         <div className="card border border-gray-100 dark:border-brand-darkBorder shadow-sm p-5">
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Used to show how much of your income you're spending each month.</p>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <input
               type="number"
               inputMode="decimal"
               min="0"
               value={income}
               onChange={(e) => setIncome(e.target.value)}
-              className="flex-1 p-3 rounded-xl border border-gray-200 dark:border-brand-darkBorder dark:bg-brand-dark dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-gold font-bold"
+              className="w-full sm:flex-1 p-3 rounded-xl border border-gray-200 dark:border-brand-darkBorder dark:bg-brand-dark dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-gold font-bold"
               placeholder="e.g. 250000"
             />
             <button
               onClick={handleSaveIncome}
               disabled={savingIncome}
-              className="btn-primary px-5 disabled:opacity-50"
+              className="btn-primary w-full sm:w-auto px-5 disabled:opacity-50"
             >
               {savingIncome ? '…' : 'Save'}
             </button>

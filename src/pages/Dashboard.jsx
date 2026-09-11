@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, AreaChart, Area, XAxis, Tooltip, YAxis } from 'recharts';
 import { getTransactions, getCategories, getBudgets, getDebts } from '../utils/storage';
-import { format, subMonths, isSameMonth, isToday, parseISO } from 'date-fns';
+import { format, subMonths, isSameMonth, isToday, isSameWeek, startOfWeek, parseISO } from 'date-fns';
 import { SkeletonLine, SkeletonList } from '../components/ui/Skeleton';
 import { useToast } from '../context/ToastContext';
 import InfoButton from '../components/ui/InfoButton';
@@ -10,6 +10,7 @@ const Dashboard = ({ onNavigate, onOpenAdd }) => {
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showDigest, setShowDigest] = useState(false);
   const toast = useToast();
 
   useEffect(() => {
@@ -39,6 +40,14 @@ const Dashboard = ({ onNavigate, onOpenAdd }) => {
       const overdueDebts = debts.filter(d => d.dueDate && parseISO(d.dueDate) < today);
       if (overdueDebts.length > 0) {
         toast.info(`${overdueDebts.length} overdue debt${overdueDebts.length !== 1 ? 's' : ''} — check your Debts page`, 5000);
+      }
+
+      // Weekly digest — shown once per week, on first visit that week
+      const weekKey = format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd');
+      const lastSeenWeek = localStorage.getItem('mopal_digest_week');
+      if (lastSeenWeek !== weekKey) {
+        setShowDigest(true);
+        localStorage.setItem('mopal_digest_week', weekKey);
       }
     })();
   }, []);
@@ -91,6 +100,20 @@ const Dashboard = ({ onNavigate, onOpenAdd }) => {
     return count;
   }, [transactions]);
 
+  // Weekly digest stats — this week's spend, transaction count, top category
+  const weeklyStats = useMemo(() => {
+    const now = new Date();
+    const weekTxs = transactions.filter(t => t.type === 'expense' && isSameWeek(parseISO(t.date), now, { weekStartsOn: 1 }));
+    const total = weekTxs.reduce((sum, t) => sum + Number(t.amount), 0);
+    const catTotals = {};
+    weekTxs.forEach(t => {
+      catTotals[t.categoryId] = (catTotals[t.categoryId] || 0) + Number(t.amount);
+    });
+    const topCategoryId = Object.keys(catTotals).sort((a, b) => catTotals[b] - catTotals[a])[0];
+    const topCategory = categories.find(c => c.id === topCategoryId);
+    return { total, count: weekTxs.length, topCategory };
+  }, [transactions, categories]);
+
   const formatCurrency = (val) => `₦${val.toLocaleString()}`;
 
   const getCategory = (id) => categories.find(c => c.id === id) || { name: 'Other', color: '#ccc' };
@@ -126,6 +149,23 @@ const Dashboard = ({ onNavigate, onOpenAdd }) => {
           <span className="text-lg">🔥</span>
           <p className="text-sm font-bold text-orange-700 dark:text-orange-400">
             {streak}-day logging streak — keep it going!
+          </p>
+        </div>
+      )}
+
+      {showDigest && weeklyStats.count > 0 && (
+        <div className="card p-4 bg-gradient-to-br from-brand-charcoal to-gray-800 text-white shadow-md border-0 relative">
+          <button
+            onClick={() => setShowDigest(false)}
+            className="absolute top-3 right-3 text-white/50 hover:text-white/90 transition-colors"
+            aria-label="Dismiss"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+          <p className="text-xs font-bold uppercase tracking-wider text-brand-gold mb-2">This Week</p>
+          <p className="text-sm text-gray-200 leading-relaxed pr-6">
+            You have spent {formatCurrency(weeklyStats.total)} across {weeklyStats.count} transaction{weeklyStats.count !== 1 ? 's' : ''} this week.
+            {weeklyStats.topCategory && ` Most of it was on ${weeklyStats.topCategory.name}.`}
           </p>
         </div>
       )}

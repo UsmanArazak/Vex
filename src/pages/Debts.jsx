@@ -79,22 +79,24 @@ const Debts = () => {
         <div className="card p-5 border-0 bg-gradient-to-br from-amber-50 to-orange-50 shadow-sm">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
             </div>
             <p className="text-xs font-bold uppercase text-amber-600/70 tracking-wider">Owed</p>
           </div>
           <p className="text-2xl font-black text-amber-700">{formatCurrency(totalOwedToMe)}</p>
-          <p className="text-xs text-amber-600/50 mt-1">{owedToMe.length} {owedToMe.length === 1 ? 'person' : 'people'}</p>
+          <p className="text-xs text-amber-600/60 mt-1">Money others will pay you</p>
+          <p className="text-xs text-amber-600/50 mt-0.5">{owedToMe.length} {owedToMe.length === 1 ? 'person' : 'people'}</p>
         </div>
         <div className="card p-5 border-0 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-sm">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
             </div>
             <p className="text-xs font-bold uppercase text-emerald-600/70 tracking-wider">I Owe</p>
           </div>
           <p className="text-2xl font-black text-emerald-700">{formatCurrency(totalIOwe)}</p>
-          <p className="text-xs text-emerald-600/50 mt-1">{iOwe.length} {iOwe.length === 1 ? 'person' : 'people'}</p>
+          <p className="text-xs text-emerald-600/60 mt-1">Money you will pay others</p>
+          <p className="text-xs text-emerald-600/50 mt-0.5">{iOwe.length} {iOwe.length === 1 ? 'person' : 'people'}</p>
         </div>
       </div>
 
@@ -158,7 +160,7 @@ const Debts = () => {
       ) : (
         <div className="text-center py-16 bg-white dark:bg-brand-darkCard rounded-3xl border border-dashed border-gray-200 dark:border-brand-darkBorder">
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-50 dark:bg-brand-darkCard flex items-center justify-center">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
           </div>
           <p className="text-gray-400 dark:text-gray-500 font-medium mb-1">No {activeTab === 'owed_to_me' ? 'debts owed to you' : 'debts you owe'}</p>
           <p className="text-xs text-gray-300 dark:text-gray-600">Tap + Add to track a debt</p>
