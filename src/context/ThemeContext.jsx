@@ -8,9 +8,12 @@ const getSystemPref = () =>
   window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 
 const applyTheme = (resolved) => {
+  // TEMPORARILY DISABLED — dark mode is off app-wide for now.
+  // To re-enable: restore the two lines below.
   const root = document.documentElement;
-  if (resolved === 'dark') root.classList.add('dark');
-  else root.classList.remove('dark');
+  root.classList.remove('dark');
+  // if (resolved === 'dark') root.classList.add('dark');
+  // else root.classList.remove('dark');
 };
 
 export const ThemeProvider = ({ children }) => {
