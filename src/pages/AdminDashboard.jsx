@@ -39,7 +39,7 @@ const AdminDashboard = ({ onSwitchToPersonal, onSignOut }) => {
 
   useEffect(() => { load(); }, []);
 
-  const signupDays = stats ? Object.entries(stats.signupTrend).sort(([a], [b]) => a.localeCompare(b)) : [];
+  const signupDays = stats ? stats.signup_trend.map(t => [t.day, t.count]) : [];
   const maxSignups = Math.max(...signupDays.map(([, v]) => v), 1);
 
   return (
@@ -90,11 +90,11 @@ const AdminDashboard = ({ onSwitchToPersonal, onSignOut }) => {
             <div>
               <h2 className="font-bold text-lg text-brand-charcoal dark:text-white mb-3">Overview</h2>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                <StatCard label="Total Users" value={stats.totalUsers} />
-                <StatCard label="Transactions" value={stats.totalTransactions.toLocaleString()} />
-                <StatCard label="Total Volume" value={formatCurrency(stats.totalVolume)} accent="text-brand-goldDark dark:text-brand-gold" />
-                <StatCard label="Active Today" value={stats.activeToday} accent="text-success" />
-                <StatCard label="Active This Week" value={stats.activeWeek} accent="text-info" />
+                <StatCard label="Total Users" value={stats.total_users} />
+                <StatCard label="Transactions" value={stats.total_transactions.toLocaleString()} />
+                <StatCard label="Total Volume" value={formatCurrency(stats.total_volume)} accent="text-brand-goldDark dark:text-brand-gold" />
+                <StatCard label="Active Today" value={stats.dau} accent="text-success" />
+                <StatCard label="Active This Week" value={stats.wau} accent="text-info" />
               </div>
             </div>
 
@@ -121,16 +121,16 @@ const AdminDashboard = ({ onSwitchToPersonal, onSignOut }) => {
               <h2 className="font-bold text-lg text-brand-charcoal dark:text-white mb-3">Feature Adoption</h2>
               <div className="grid grid-cols-3 gap-3">
                 {[
-                  ['Budgets', stats.adoption.budgets],
-                  ['Recurring', stats.adoption.recurring],
-                  ['Goals', stats.adoption.goals],
+                  ['Budgets', stats.users_with_budgets],
+                  ['Recurring', stats.users_with_recurring],
+                  ['Goals', stats.users_with_goals],
                 ].map(([label, count]) => {
-                  const pct = stats.adoption.totalUsers > 0 ? Math.round((count / stats.adoption.totalUsers) * 100) : 0;
+                  const pct = stats.total_users > 0 ? Math.round((count / stats.total_users) * 100) : 0;
                   return (
                     <div key={label} className="card p-4 border border-gray-100 dark:border-brand-darkBorder shadow-sm text-center">
                       <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">{label}</p>
                       <p className="text-xl font-black text-brand-charcoal dark:text-white mb-1">{pct}%</p>
-                      <p className="text-xs text-gray-400 dark:text-gray-500">{count} of {stats.adoption.totalUsers} users</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500">{count} of {stats.total_users} users</p>
                     </div>
                   );
                 })}
@@ -154,7 +154,7 @@ const AdminDashboard = ({ onSwitchToPersonal, onSignOut }) => {
                     {stats.users.map((u) => (
                       <tr key={u.email} className="border-b border-gray-50 dark:border-brand-darkBorder last:border-0">
                         <td className="p-3 text-brand-charcoal dark:text-white font-medium truncate max-w-[200px]">{u.email}</td>
-                        <td className="p-3 text-gray-500 dark:text-gray-400">{new Date(u.created_at).toLocaleDateString()}</td>
+                        <td className="p-3 text-gray-500 dark:text-gray-400">{new Date(u.joined_at).toLocaleDateString()}</td>
                         <td className="p-3 text-gray-500 dark:text-gray-400">{u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleDateString() : '—'}</td>
                         <td className="p-3 text-right font-bold text-brand-charcoal dark:text-white">{u.transaction_count}</td>
                       </tr>
