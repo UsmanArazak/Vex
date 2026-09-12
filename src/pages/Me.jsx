@@ -841,30 +841,34 @@ const RecurringScreen = ({ onBack }) => {
       ) : (
         <div className="space-y-2">
           {recurringRules.map(rule => (
-            <div key={rule.id} className="card p-4 border border-gray-100 dark:border-brand-darkBorder shadow-sm flex items-center justify-between gap-3">
-              <button className="flex-1 text-left min-w-0" onClick={() => { setEditingRule(rule); setIsRecurringModalOpen(true); }}>
-                <p className="font-bold text-brand-charcoal dark:text-white text-sm truncate">
-                  {rule.note || getCategoryName(rule.categoryId)}
-                </p>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <p className="text-xs text-gray-400 dark:text-gray-500">
+            <div key={rule.id} className="card p-4 border border-gray-100 dark:border-brand-darkBorder shadow-sm">
+              <div className="flex items-center justify-between gap-3">
+                <button className="flex-1 text-left min-w-0" onClick={() => { setEditingRule(rule); setIsRecurringModalOpen(true); }}>
+                  <p className="font-bold text-brand-charcoal dark:text-white text-sm truncate">
+                    {rule.note || getCategoryName(rule.categoryId)}
+                  </p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
                     {FREQ_LABEL[rule.frequency]} · ₦{Number(rule.amount).toLocaleString()} · {rule.type === 'expense' ? 'Expense' : 'Income'}
                   </p>
+                </button>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => toggleRuleActive(rule)}
+                    className={`w-10 h-6 rounded-full relative transition-colors duration-200 shrink-0 ${rule.isActive ? 'bg-brand-gold' : 'bg-gray-200 dark:bg-brand-darkBorder'}`}
+                    title={rule.isActive ? 'Active' : 'Paused'}
+                  >
+                    <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-md transition-transform duration-200 ${rule.isActive ? 'translate-x-4' : 'translate-x-0'}`} />
+                  </button>
+                  <button onClick={() => handleDeleteRule(rule.id)} className="text-gray-300 hover:text-danger transition-colors">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>
+                  </button>
+                </div>
+              </div>
+              {getDueBadge(rule) && (
+                <div className="mt-2.5 pt-2.5 border-t border-gray-100 dark:border-brand-darkBorder">
                   {getDueBadge(rule)}
                 </div>
-              </button>
-              <div className="flex items-center gap-2 shrink-0">
-                <button
-                  onClick={() => toggleRuleActive(rule)}
-                  className={`w-10 h-6 rounded-full relative transition-colors duration-200 shrink-0 ${rule.isActive ? 'bg-brand-gold' : 'bg-gray-200 dark:bg-brand-darkBorder'}`}
-                  title={rule.isActive ? 'Active' : 'Paused'}
-                >
-                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-md transition-transform duration-200 ${rule.isActive ? 'translate-x-4' : 'translate-x-0'}`} />
-                </button>
-                <button onClick={() => handleDeleteRule(rule.id)} className="text-gray-300 hover:text-danger transition-colors">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>
-                </button>
-              </div>
+              )}
             </div>
           ))}
         </div>

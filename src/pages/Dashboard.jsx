@@ -6,11 +6,20 @@ import { SkeletonLine, SkeletonList } from '../components/ui/Skeleton';
 import { useToast } from '../context/ToastContext';
 import InfoButton from '../components/ui/InfoButton';
 
+// Guards a reminder to only appear once per calendar day, tracked per key.
+const shouldShowOncePerDay = (key) => {
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
+  if (localStorage.getItem(key) === todayStr) return false;
+  localStorage.setItem(key, todayStr);
+  return true;
+};
+
 const Dashboard = ({ onNavigate, onOpenAdd }) => {
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showDigest, setShowDigest] = useState(false);
+  const [showStreak, setShowStreak] = useState(false);
   const toast = useToast();
 
   useEffect(() => {
@@ -28,7 +37,7 @@ const Dashboard = ({ onNavigate, onOpenAdd }) => {
           const spent = monthTxs.filter(t => t.categoryId === b.categoryId).reduce((s, t) => s + Number(t.amount), 0);
           return spent > b.limitAmount;
         });
-        if (overspent.length > 0) {
+        if (overspent.length > 0 && shouldShowOncePerDay('mopal_alert_budget')) {
           const names = overspent.map(b => cats.find(c => c.id === b.categoryId)?.name).filter(Boolean);
           toast.info(`Over budget this month: ${names.join(', ')}`, 5000);
         }
@@ -38,7 +47,7 @@ const Dashboard = ({ onNavigate, onOpenAdd }) => {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const overdueDebts = debts.filter(d => d.dueDate && parseISO(d.dueDate) < today);
-      if (overdueDebts.length > 0) {
+      if (overdueDebts.length > 0 && shouldShowOncePerDay('mopal_alert_debt')) {
         toast.info(`${overdueDebts.length} overdue debt${overdueDebts.length !== 1 ? 's' : ''} — check your Debts page`, 5000);
       }
 
@@ -48,8 +57,13 @@ const Dashboard = ({ onNavigate, onOpenAdd }) => {
       const todayStr = format(today, 'yyyy-MM-dd');
       const tomorrowStr = format(tomorrow, 'yyyy-MM-dd');
       const dueSoon = recurringRules.filter(r => r.isActive && (r.nextRunDate === todayStr || r.nextRunDate === tomorrowStr));
-      if (dueSoon.length > 0) {
+      if (dueSoon.length > 0 && shouldShowOncePerDay('mopal_alert_recurring')) {
         toast.info(`${dueSoon.length} recurring payment${dueSoon.length !== 1 ? 's' : ''} due soon — check Recurring in Me`, 5000);
+      }
+
+      // Streak badge — shown once per day, dismissible, not on every visit
+      if (shouldShowOncePerDay('mopal_streak_seen')) {
+        setShowStreak(true);
       }
 
       // Weekly digest — shown once per week, on first visit that week
@@ -154,12 +168,19 @@ const Dashboard = ({ onNavigate, onOpenAdd }) => {
         </button>
       </header>
 
-      {streak >= 2 && (
+      {showStreak && streak >= 2 && (
         <div className="flex items-center gap-2 bg-orange-50 dark:bg-orange-950/30 border border-orange-100 dark:border-orange-900/40 rounded-xl px-4 py-2.5 -mt-1">
-          <span className="text-lg">🔥</span>
-          <p className="text-sm font-bold text-orange-700 dark:text-orange-400">
+          <span className="text-lg shrink-0">🔥</span>
+          <p className="text-sm font-bold text-orange-700 dark:text-orange-400 flex-1">
             {streak}-day logging streak — keep it going!
           </p>
+          <button
+            onClick={() => setShowStreak(false)}
+            className="w-6 h-6 shrink-0 rounded-full flex items-center justify-center text-orange-400 hover:text-orange-600 hover:bg-orange-100 dark:hover:bg-orange-950/50 transition-colors"
+            aria-label="Dismiss"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
         </div>
       )}
 
