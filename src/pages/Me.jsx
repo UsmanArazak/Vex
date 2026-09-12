@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import {
   getTransactions, getCategories, getBudgets, getDebts,
   exportData, importData, clearAllData,
@@ -122,6 +123,7 @@ const SpendingScreen = ({ onBack }) => {
   const [budgets, setBudgets] = useState([]);
   const [debts, setDebts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedMonth, setSelectedMonth] = useState(null);
   const { user } = useAuth();
 
   const currentMonthKey = format(new Date(), 'yyyy-MM');
@@ -163,12 +165,12 @@ const SpendingScreen = ({ onBack }) => {
   }, [transactions]);
 
   const monthlyTrend = useMemo(() => {
-    return Array.from({ length: 4 }).map((_, i) => {
-      const month = subMonths(now, 3 - i);
+    return Array.from({ length: 12 }).map((_, i) => {
+      const month = subMonths(now, 11 - i);
       const total = transactions
         .filter(t => t.type === 'expense' && isSameMonth(parseISO(t.date), month))
         .reduce((acc, t) => acc + Number(t.amount), 0);
-      return { label: format(month, 'MMM'), total, isCurrent: i === 3 };
+      return { label: format(month, 'MMM'), date: month, total, isCurrent: i === 11 };
     });
   }, [transactions]);
 
@@ -351,14 +353,18 @@ const SpendingScreen = ({ onBack }) => {
 
       <section className="card p-5 border border-gray-100 dark:border-brand-darkBorder shadow-sm">
         <div className="mb-4">
-          <h2 className="font-bold text-base text-brand-charcoal dark:text-white">4-Month Spending Trend</h2>
-          <p className="text-xs text-gray-400 dark:text-gray-500">Comparing your monthly expenses</p>
+          <h2 className="font-bold text-base text-brand-charcoal dark:text-white">12-Month Spending Trend</h2>
+          <p className="text-xs text-gray-400 dark:text-gray-500">Tap a month to see its breakdown</p>
         </div>
-        <div className="flex items-end justify-between gap-3 h-36 pt-4 pb-1">
+        <div className="flex items-end gap-3 h-36 pt-4 pb-1 overflow-x-auto hide-scrollbar">
           {monthlyTrend.map((m) => {
             const heightPct = maxTrend > 0 ? Math.round((m.total / maxTrend) * 100) : 0;
             return (
-              <div key={m.label} className="flex flex-col items-center gap-2 flex-1 h-full justify-end">
+              <button
+                key={m.label + m.date.getFullYear()}
+                onClick={() => setSelectedMonth(m.date)}
+                className="flex flex-col items-center gap-2 h-full justify-end shrink-0 w-14"
+              >
                 <p className={`text-[11px] font-bold ${m.isCurrent ? 'text-brand-charcoal dark:text-white' : 'text-gray-400'}`}>
                   {m.total > 0 ? formatCurrency(m.total) : '₦0'}
                 </p>
@@ -372,16 +378,89 @@ const SpendingScreen = ({ onBack }) => {
                   <p className={`text-xs font-bold ${m.isCurrent ? 'text-brand-charcoal dark:text-white' : 'text-gray-400'}`}>{m.label}</p>
                   {m.isCurrent && <span className="w-1.5 h-1.5 bg-brand-gold rounded-full mt-0.5"></span>}
                 </div>
-              </div>
+              </button>
             );
           })}
         </div>
       </section>
 
+      <MonthBreakdownModal
+        month={selectedMonth}
+        transactions={transactions}
+        categories={categories}
+        onClose={() => setSelectedMonth(null)}
+      />
     </div>
   );
 };
 
+// Shown when a month is tapped on the 12-month trend chart.
+// Uses transactions already loaded on this screen — no extra network call.
+const MonthBreakdownModal = ({ month, transactions, categories, onClose }) => {
+  if (!month) return null;
+  const formatCurrency = (val) => `₦${Number(val).toLocaleString()}`;
+  const getCategory = (id) => categories.find(c => c.id === id) || { name: 'Other', color: '#ccc' };
+
+  const { total, byCategory } = (() => {
+    let t = 0;
+    const catMap = {};
+    transactions.forEach(tx => {
+      if (tx.type !== 'expense') return;
+      if (!isSameMonth(parseISO(tx.date), month)) return;
+      const amount = Number(tx.amount);
+      const cat = getCategory(tx.categoryId);
+      t += amount;
+      if (!catMap[tx.categoryId]) catMap[tx.categoryId] = { cat, total: 0, count: 0 };
+      catMap[tx.categoryId].total += amount;
+      catMap[tx.categoryId].count += 1;
+    });
+    return { total: t, byCategory: Object.values(catMap).sort((a, b) => b.total - a.total) };
+  })();
+
+  return createPortal(
+    <div className="fixed inset-0 z-[150] flex items-end sm:items-center justify-center bg-brand-charcoal/50 backdrop-blur-sm animate-toast-in" onClick={onClose}>
+      <div
+        className="bg-white dark:bg-brand-darkCard rounded-t-3xl sm:rounded-3xl p-6 w-full sm:max-w-md shadow-2xl max-h-[85vh] overflow-y-auto animate-scale-in"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex justify-between items-center mb-1">
+          <h2 className="text-xl font-bold text-brand-charcoal dark:text-white">{format(month, 'MMMM yyyy')}</h2>
+          <button onClick={onClose} className="p-2 bg-gray-100 dark:bg-brand-darkBorder rounded-full text-gray-500 dark:text-gray-400 hover:text-brand-charcoal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        </div>
+        <p className="text-2xl font-black text-brand-charcoal dark:text-white mb-5">{formatCurrency(total)}</p>
+
+        {byCategory.length > 0 ? (
+          <div className="space-y-3">
+            {byCategory.map(({ cat, total: catTotal, count }) => {
+              const pct = total > 0 ? Math.round((catTotal / total) * 100) : 0;
+              return (
+                <div key={cat.id} className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0" style={{ backgroundColor: cat.color }}>
+                    {cat.name.charAt(0)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-sm font-bold text-brand-charcoal dark:text-white truncate">{cat.name}</span>
+                      <span className="text-sm font-bold text-gray-500 dark:text-gray-400 shrink-0 ml-2">{formatCurrency(catTotal)}</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-gray-100 dark:bg-brand-darkBorder rounded-full overflow-hidden">
+                      <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: cat.color }} />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-6">No expenses recorded this month.</p>
+        )}
+      </div>
+    </div>,
+    document.body
+  );
+};
 // ============================= BUDGETS =============================
 const BudgetsScreen = ({ onBack }) => {
   const [transactions, setTransactions] = useState([]);
