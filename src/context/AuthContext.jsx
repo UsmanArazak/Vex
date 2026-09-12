@@ -73,6 +73,7 @@ export const AuthProvider = ({ children }) => {
   const value = {
     session,
     user: session?.user ?? null,
+    isAdmin: session?.user?.app_metadata?.is_admin === true,
     loading,
     isPasswordRecovery,
     signUp,
