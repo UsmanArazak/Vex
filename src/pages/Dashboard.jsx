@@ -164,16 +164,20 @@ const Dashboard = ({ onNavigate, onOpenAdd }) => {
       )}
 
       {showDigest && weeklyStats.count > 0 && (
-        <div className="card p-4 bg-gradient-to-br from-brand-charcoal to-gray-800 text-white shadow-md border-0 relative">
-          <button
-            onClick={() => setShowDigest(false)}
-            className="absolute top-3 right-3 text-white/50 hover:text-white/90 transition-colors"
-            aria-label="Dismiss"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-          </button>
-          <p className="text-xs font-bold uppercase tracking-wider text-brand-gold mb-2">This Week</p>
-          <p className="text-sm text-gray-200 leading-relaxed pr-6">
+        <div className="card p-5 bg-gradient-to-br from-brand-charcoal to-gray-800 text-white shadow-md border border-white/10">
+          <div className="flex items-center justify-between mb-3.5">
+            <span className="text-xs font-bold uppercase tracking-wider text-brand-gold bg-brand-gold/10 px-2.5 py-1 rounded-full border border-brand-gold/20">
+              This Week
+            </span>
+            <button
+              onClick={() => setShowDigest(false)}
+              className="w-7 h-7 shrink-0 rounded-full flex items-center justify-center text-white/50 hover:text-white/90 hover:bg-white/10 transition-colors"
+              aria-label="Dismiss"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+          </div>
+          <p className="text-sm text-gray-200 leading-relaxed">
             You have spent {formatCurrency(weeklyStats.total)} across {weeklyStats.count} transaction{weeklyStats.count !== 1 ? 's' : ''} this week.
             {weeklyStats.topCategory && ` Most of it was on ${weeklyStats.topCategory.name}.`}
           </p>
